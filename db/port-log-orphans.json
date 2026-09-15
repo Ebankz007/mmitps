@@ -1,0 +1,142 @@
+{
+  "portedAt": "2026-09-12T12:49:13.399Z",
+  "subscriptions": [
+    {
+      "_id": "69a0d782311b7f935be10e3b",
+      "user": "69a0d782311b7f935be10e36",
+      "plan": "69a0d782311b7f935be10e2d",
+      "type": "service",
+      "status": "past_due",
+      "currentPeriodEnd": "2026-01-26T23:30:10.614Z",
+      "cancelAtPeriodEnd": false,
+      "__v": 0,
+      "createdAt": "2026-02-26T23:30:10.616Z",
+      "updatedAt": "2026-02-26T23:30:10.616Z"
+    },
+    {
+      "_id": "69b3af49e3af65124e8e4083",
+      "user": "69b3af48e3af65124e8e407b",
+      "plan": "69b39fb4849676cc8536e627",
+      "type": "membership",
+      "status": "active",
+      "currentPeriodStart": "2026-03-13T06:31:37.609Z",
+      "currentPeriodEnd": null,
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-03-13T06:31:37.610Z",
+      "updatedAt": "2026-03-13T06:31:37.610Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3afdc04df7a18f518cc84",
+      "user": "69b3afdb04df7a18f518cc73",
+      "plan": "69b39fb4849676cc8536e627",
+      "type": "membership",
+      "status": "active",
+      "currentPeriodStart": "2026-03-13T06:34:04.288Z",
+      "currentPeriodEnd": null,
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-03-13T06:34:04.292Z",
+      "updatedAt": "2026-03-13T06:34:04.292Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb7155e1",
+      "user": "69b3b08db3dd52dccb7155d0",
+      "plan": "69b39fb4849676cc8536e627",
+      "type": "membership",
+      "status": "active",
+      "currentPeriodStart": "2026-03-13T06:37:02.543Z",
+      "currentPeriodEnd": null,
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-03-13T06:37:02.545Z",
+      "updatedAt": "2026-03-13T06:37:02.545Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0bdd",
+      "user": "69b3b34c4de8fd6f005b0bd1",
+      "plan": "69b3b3444de8fd6f005b0b62",
+      "type": "membership",
+      "status": "active",
+      "currentPeriodStart": "2026-03-13T06:48:45.224Z",
+      "currentPeriodEnd": null,
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-03-13T06:48:45.226Z",
+      "updatedAt": "2026-03-13T06:48:45.226Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a6238d6",
+      "user": "69b3b3aa8a573b873a6238ca",
+      "plan": "69b3b3a38a573b873a62385b",
+      "type": "membership",
+      "status": "active",
+      "currentPeriodStart": "2026-03-13T06:50:20.092Z",
+      "currentPeriodEnd": null,
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-03-13T06:50:20.094Z",
+      "updatedAt": "2026-03-13T06:50:20.094Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a62391a",
+      "user": "69b3b3aa8a573b873a6238ca",
+      "plan": "69b3b3a38a573b873a623863",
+      "serviceKey": "signal_service",
+      "type": "service",
+      "status": "active",
+      "currentPeriodStart": "2026-03-13T06:50:20.297Z",
+      "currentPeriodEnd": "2026-04-13T06:50:20.297Z",
+      "cancelAtPeriodEnd": false,
+      "createdAt": "2026-03-13T06:50:20.298Z",
+      "updatedAt": "2026-03-13T06:50:20.298Z",
+      "__v": 0
+    }
+  ],
+  "invoices": [
+    {
+      "_id": "6998a6b5e43afe454c886f63",
+      "user": "699874869d0d8a0f58f0805b",
+      "amount": 99,
+      "currency": "USD",
+      "status": "open",
+      "paidAt": null,
+      "createdAt": "2026-02-20T18:23:49.701Z",
+      "updatedAt": "2026-02-20T18:23:49.701Z",
+      "__v": 0
+    },
+    {
+      "_id": "6998a6f4e43afe454c886f8c",
+      "user": "699874869d0d8a0f58f0805b",
+      "amount": 99,
+      "currency": "USD",
+      "status": "open",
+      "paidAt": null,
+      "createdAt": "2026-02-20T18:24:52.521Z",
+      "updatedAt": "2026-02-20T18:24:52.521Z",
+      "__v": 0
+    },
+    {
+      "_id": "6998e82a6f3b007e7b6169be",
+      "user": "699874869d0d8a0f58f0805b",
+      "amount": 99,
+      "currency": "USD",
+      "status": "open",
+      "paidAt": null,
+      "createdAt": "2026-02-20T23:03:06.391Z",
+      "updatedAt": "2026-02-20T23:03:06.391Z",
+      "__v": 0
+    },
+    {
+      "_id": "6998e8656f3b007e7b6169ed",
+      "user": "699874869d0d8a0f58f0805b",
+      "amount": 99,
+      "currency": "USD",
+      "status": "open",
+      "paidAt": null,
+      "createdAt": "2026-02-20T23:04:05.792Z",
+      "updatedAt": "2026-02-20T23:04:05.792Z",
+      "__v": 0
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "orphans": [
+    {
+      "collection": "tradejournals",
+      "docId": "69906fc0f3b891c27d0a4d16",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradejournals",
+      "docId": "69906fcc6b8cb31173ecff10",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradejournals",
+      "docId": "699073b945d9d03103905968",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradejournals",
+      "docId": "699073b945d9d03103905969",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradejournals",
+      "docId": "699073b945d9d0310390596a",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradejournals",
+      "docId": "699073b945d9d0310390596b",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradejournals",
+      "docId": "699073b945d9d0310390596c",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f1bf3b891c27d0a4cc6",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f30f3b891c27d0a4ccc",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f5ff3b891c27d0a4cdb",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f7ef3b891c27d0a4ce5",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f97f3b891c27d0a4cfd",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906fccf3b891c27d0a4d1d",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197"
+    },
+    {
+      "collection": "signals",
+      "docId": "698eef88a1b5f71e842c5e92",
+      "reason": "phantom user ref provider=698eef88a1b5f71e842c5e8e"
+    },
+    {
+      "collection": "signals",
+      "docId": "698fcff33a0d276f22b1035c",
+      "reason": "phantom user ref provider=698fcff33a0d276f22b10358"
+    },
+    {
+      "collection": "analyses",
+      "docId": "698ef0a6e62ce8d490ad720c",
+      "reason": "phantom user ref author=698ef0a6e62ce8d490ad7208"
+    },
+    {
+      "collection": "copysubscriptions",
+      "docId": "698eef89a1b5f71e842c5ea9",
+      "reason": "phantom user ref follower=698eef88a1b5f71e842c5e95"
+    },
+    {
+      "collection": "copysubscriptions",
+      "docId": "698eef89a1b5f71e842c5ea9",
+      "reason": "phantom user ref provider=698eef88a1b5f71e842c5e8e"
+    },
+    {
+      "collection": "copysubscriptions",
+      "docId": "698fcff33a0d276f22b10373",
+      "reason": "phantom user ref follower=698fcff33a0d276f22b1035f"
+    },
+    {
+      "collection": "copysubscriptions",
+      "docId": "698fcff33a0d276f22b10373",
+      "reason": "phantom user ref provider=698fcff33a0d276f22b10358"
+    }
+  ]
+}

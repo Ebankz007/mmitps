@@ -1,0 +1,13 @@
+{
+    "watch": [
+        "backend",
+        ".env"
+    ],
+    "ext": "js,json,env",
+    "ignore": [
+        "frontend/*",
+        "backend/uploads/*",
+        "backend/logs/*"
+    ],
+    "exec": "node"
+}

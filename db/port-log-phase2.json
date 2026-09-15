@@ -1,0 +1,1287 @@
+{
+  "portedAt": "2026-09-12T13:40:11.223Z",
+  "wallets": [
+    {
+      "_id": "698f10324b4310ae97c94ba5",
+      "user": "698f0ded4ba76f7e76b64194",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 15420.5,
+          "frozen": 0,
+          "_id": "698f10324b4310ae97c94ba6"
+        },
+        {
+          "currency": "EUR",
+          "amount": 2500,
+          "frozen": 0,
+          "_id": "698f10324b4310ae97c94ba7"
+        },
+        {
+          "currency": "BTC",
+          "amount": 0.25,
+          "frozen": 0.05,
+          "_id": "698f10324b4310ae97c94ba8"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-02-13T11:51:14.326Z",
+      "updatedAt": "2026-02-13T11:51:14.326Z",
+      "__v": 0
+    },
+    {
+      "_id": "698f10324b4310ae97c94bb0",
+      "user": "698f0dec4ba76f7e76b6418a",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 15420.5,
+          "frozen": 0,
+          "_id": "698f10324b4310ae97c94bb1"
+        },
+        {
+          "currency": "EUR",
+          "amount": 2500,
+          "frozen": 0,
+          "_id": "698f10324b4310ae97c94bb2"
+        },
+        {
+          "currency": "BTC",
+          "amount": 0.25,
+          "frozen": 0.05,
+          "_id": "698f10324b4310ae97c94bb3"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-02-13T11:51:14.349Z",
+      "updatedAt": "2026-02-13T11:51:14.349Z",
+      "__v": 0
+    },
+    {
+      "_id": "698fcfea3a0d276f22b1033f",
+      "user": "698fcfea3a0d276f22b1033a",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 500,
+          "frozen": 500,
+          "_id": "698fcfea3a0d276f22b10340"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-02-14T01:29:14.933Z",
+      "updatedAt": "2026-02-14T01:29:14.955Z",
+      "__v": 0
+    },
+    {
+      "_id": "698fcff33a0d276f22b10364",
+      "user": "698fcff33a0d276f22b1035f",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 1000,
+          "frozen": 1000,
+          "_id": "698fcff33a0d276f22b10365"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-02-14T01:29:23.975Z",
+      "updatedAt": "2026-02-14T01:29:23.986Z",
+      "__v": 0
+    },
+    {
+      "_id": "69905c108eb0ae6b8876009c",
+      "user": "698f0ded4ba76f7e76b64197",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69905c108eb0ae6b8876009d"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-02-14T11:27:12.545Z",
+      "updatedAt": "2026-02-14T11:27:12.545Z",
+      "__v": 0
+    },
+    {
+      "_id": "69a0da12092763bb0bb43c1a",
+      "user": "69a0d782311b7f935be10e32",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69a0da12092763bb0bb43c1b"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-02-26T23:41:06.103Z",
+      "updatedAt": "2026-02-26T23:41:06.103Z",
+      "__v": 0
+    },
+    {
+      "_id": "69a172256a61f64964852a30",
+      "user": "69a16c8868783ef9309019ed",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69a172256a61f64964852a31"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-02-27T10:29:57.680Z",
+      "updatedAt": "2026-02-27T10:29:57.680Z",
+      "__v": 0
+    },
+    {
+      "_id": "69a24829660c56e3e1eda1da",
+      "user": "69a16c8868783ef9309019e3",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 200,
+          "frozen": 0,
+          "_id": "69a24829660c56e3e1eda1db"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-02-28T01:43:05.525Z",
+      "updatedAt": "2026-03-23T00:26:22.025Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3af49e3af65124e8e4088",
+      "user": "69b3af41e3af65124e8e403c",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3af49e3af65124e8e4089"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:31:37.653Z",
+      "updatedAt": "2026-03-13T06:31:37.653Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3af49e3af65124e8e408f",
+      "user": "69b3af43e3af65124e8e4053",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3af49e3af65124e8e4090"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:31:37.681Z",
+      "updatedAt": "2026-03-13T06:31:37.681Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3af49e3af65124e8e4096",
+      "user": "69b3af44e3af65124e8e405b",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3af49e3af65124e8e4097"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:31:37.698Z",
+      "updatedAt": "2026-03-13T06:31:37.698Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3af49e3af65124e8e409d",
+      "user": "69b3af45e3af65124e8e4063",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3af49e3af65124e8e409e"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:31:37.715Z",
+      "updatedAt": "2026-03-13T06:31:37.715Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3af49e3af65124e8e40a4",
+      "user": "69b3af46e3af65124e8e406b",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3af49e3af65124e8e40a5"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:31:37.731Z",
+      "updatedAt": "2026-03-13T06:31:37.731Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3af49e3af65124e8e40ab",
+      "user": "69b3af47e3af65124e8e4073",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3af49e3af65124e8e40ac"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:31:37.748Z",
+      "updatedAt": "2026-03-13T06:31:37.748Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3afdc04df7a18f518cc8a",
+      "user": "69b3afd904df7a18f518cc63",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3afdc04df7a18f518cc8b"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:34:04.349Z",
+      "updatedAt": "2026-03-13T06:34:04.349Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3afdc04df7a18f518cc8f",
+      "user": "69b3afd304df7a18f518cc17",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3afdc04df7a18f518cc90"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:34:04.384Z",
+      "updatedAt": "2026-03-13T06:34:04.384Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb7155e7",
+      "user": "69b3b08cb3dd52dccb7155c0",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b08eb3dd52dccb7155e8"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:37:02.590Z",
+      "updatedAt": "2026-03-13T06:37:02.645Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb7155f3",
+      "user": "69b3b08bb3dd52dccb7155b0",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b08eb3dd52dccb7155f4"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:37:02.682Z",
+      "updatedAt": "2026-03-13T06:37:02.690Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb7155ff",
+      "user": "69b3b08ab3dd52dccb7155a0",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b08eb3dd52dccb715600"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:37:02.707Z",
+      "updatedAt": "2026-03-13T06:37:02.714Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb71560b",
+      "user": "69b3b089b3dd52dccb715590",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b08eb3dd52dccb71560c"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:37:02.730Z",
+      "updatedAt": "2026-03-13T06:37:02.735Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb715617",
+      "user": "69b3b087b3dd52dccb715580",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b08eb3dd52dccb715618"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:37:02.753Z",
+      "updatedAt": "2026-03-13T06:37:02.761Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb715621",
+      "user": "69b3b086b3dd52dccb715574",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3b08eb3dd52dccb715622"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:37:02.778Z",
+      "updatedAt": "2026-03-13T06:37:02.778Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0be3",
+      "user": "69b3b34b4de8fd6f005b0bc6",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b34d4de8fd6f005b0be4"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:48:45.272Z",
+      "updatedAt": "2026-03-13T06:48:45.279Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0bef",
+      "user": "69b3b3494de8fd6f005b0bbb",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b34d4de8fd6f005b0bf0"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:48:45.305Z",
+      "updatedAt": "2026-03-13T06:48:45.309Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0bfb",
+      "user": "69b3b3484de8fd6f005b0bb0",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b34d4de8fd6f005b0bfc"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:48:45.329Z",
+      "updatedAt": "2026-03-13T06:48:45.338Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0c07",
+      "user": "69b3b3474de8fd6f005b0ba5",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b34d4de8fd6f005b0c08"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:48:45.355Z",
+      "updatedAt": "2026-03-13T06:48:45.361Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0c13",
+      "user": "69b3b3464de8fd6f005b0b9a",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b34d4de8fd6f005b0c14"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:48:45.380Z",
+      "updatedAt": "2026-03-13T06:48:45.389Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a6238dc",
+      "user": "69b3b3a98a573b873a6238bf",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b3ac8a573b873a6238dd"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:50:20.128Z",
+      "updatedAt": "2026-03-13T06:50:20.138Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a6238e8",
+      "user": "69b3b3a88a573b873a6238b4",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b3ac8a573b873a6238e9"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:50:20.159Z",
+      "updatedAt": "2026-03-13T06:50:20.166Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a6238f4",
+      "user": "69b3b3a78a573b873a6238a9",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b3ac8a573b873a6238f5"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:50:20.189Z",
+      "updatedAt": "2026-03-13T06:50:20.200Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a623900",
+      "user": "69b3b3a68a573b873a62389e",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b3ac8a573b873a623901"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:50:20.222Z",
+      "updatedAt": "2026-03-13T06:50:20.232Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a62390c",
+      "user": "69b3b3a58a573b873a623893",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 24.900000000000002,
+          "frozen": 0,
+          "_id": "69b3b3ac8a573b873a62390d"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:50:20.255Z",
+      "updatedAt": "2026-03-13T06:50:20.265Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a623924",
+      "user": "69b3b3a38a573b873a623888",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69b3b3ac8a573b873a623925"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-13T06:50:20.338Z",
+      "updatedAt": "2026-03-13T06:50:20.338Z",
+      "__v": 0
+    },
+    {
+      "_id": "69bb69f5cdb11159345952b6",
+      "user": "69a16c8868783ef9309019ea",
+      "balances": [
+        {
+          "currency": "USD",
+          "amount": 0,
+          "frozen": 0,
+          "_id": "69bb69f5cdb11159345952b7"
+        }
+      ],
+      "isActive": true,
+      "settings": {
+        "defaultCurrency": "USD",
+        "autoConvert": false
+      },
+      "createdAt": "2026-03-19T03:13:57.459Z",
+      "updatedAt": "2026-03-19T03:13:57.459Z",
+      "__v": 0
+    }
+  ],
+  "transactions": [
+    {
+      "_id": "698f10324b4310ae97c94bab",
+      "user": "698f0ded4ba76f7e76b64194",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 10000,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "bank_transfer",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "DEP-1770983474331-1",
+      "description": "Initial balance funding",
+      "__v": 0,
+      "createdAt": "2026-02-13T11:51:14.334Z",
+      "updatedAt": "2026-02-13T11:51:14.334Z"
+    },
+    {
+      "_id": "698f10324b4310ae97c94bac",
+      "user": "698f0ded4ba76f7e76b64194",
+      "type": "withdrawal",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 500,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "crypto",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "WTH-1770983474331-1",
+      "description": "Direct profit withdrawal",
+      "__v": 0,
+      "createdAt": "2026-02-13T11:51:14.334Z",
+      "updatedAt": "2026-02-13T11:51:14.334Z"
+    },
+    {
+      "_id": "698f10324b4310ae97c94bad",
+      "user": "698f0ded4ba76f7e76b64194",
+      "type": "transfer_in",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 5920.5,
+      "currency": "USD",
+      "fee": 0,
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "TRF-1770983474331-1",
+      "description": "Commission yield deposit",
+      "__v": 0,
+      "createdAt": "2026-02-13T11:51:14.334Z",
+      "updatedAt": "2026-02-13T11:51:14.334Z"
+    },
+    {
+      "_id": "698f10324b4310ae97c94bb5",
+      "user": "698f0dec4ba76f7e76b6418a",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 10000,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "bank_transfer",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "DEP-1770983474350-1",
+      "description": "Initial balance funding",
+      "__v": 0,
+      "createdAt": "2026-02-13T11:51:14.351Z",
+      "updatedAt": "2026-02-13T11:51:14.351Z"
+    },
+    {
+      "_id": "698f10324b4310ae97c94bb6",
+      "user": "698f0dec4ba76f7e76b6418a",
+      "type": "withdrawal",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 500,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "crypto",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "WTH-1770983474350-1",
+      "description": "Direct profit withdrawal",
+      "__v": 0,
+      "createdAt": "2026-02-13T11:51:14.351Z",
+      "updatedAt": "2026-02-13T11:51:14.351Z"
+    },
+    {
+      "_id": "698f10324b4310ae97c94bb7",
+      "user": "698f0dec4ba76f7e76b6418a",
+      "type": "transfer_in",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 5920.5,
+      "currency": "USD",
+      "fee": 0,
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "TRF-1770983474350-1",
+      "description": "Commission yield deposit",
+      "__v": 0,
+      "createdAt": "2026-02-13T11:51:14.351Z",
+      "updatedAt": "2026-02-13T11:51:14.351Z"
+    },
+    {
+      "_id": "698fbe493c2ea865d7f4eefc",
+      "user": "698fbe493c2ea865d7f4eedf",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 1000,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "manual",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "Audit-Ref-123",
+      "description": "Deposit of 1000 USD",
+      "createdAt": "2026-02-14T00:14:01.406Z",
+      "updatedAt": "2026-02-14T00:14:01.406Z",
+      "__v": 0
+    },
+    {
+      "_id": "698fbe8b07c7bbbfc4a056f5",
+      "user": "698fbe8b07c7bbbfc4a056d7",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 1000,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "manual",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "Audit-Ref-1771028107602",
+      "description": "Deposit of 1000 USD",
+      "createdAt": "2026-02-14T00:15:07.608Z",
+      "updatedAt": "2026-02-14T00:15:07.608Z",
+      "__v": 0
+    },
+    {
+      "_id": "698fbea29dec50a18359670f",
+      "user": "698fbea29dec50a1835966ef",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 1000,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "manual",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "Audit-Ref-1771028130934",
+      "description": "Deposit of 1000 USD",
+      "createdAt": "2026-02-14T00:15:30.938Z",
+      "updatedAt": "2026-02-14T00:15:30.938Z",
+      "__v": 0
+    },
+    {
+      "_id": "698fcfea3a0d276f22b10342",
+      "user": "698fcfea3a0d276f22b1033a",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 1000,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "card",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "DEP-1771032554934-899",
+      "description": "Deposit of 1000 USD",
+      "createdAt": "2026-02-14T01:29:14.935Z",
+      "updatedAt": "2026-02-14T01:29:14.935Z",
+      "__v": 0
+    },
+    {
+      "_id": "698fcfea3a0d276f22b1034c",
+      "user": "698fcfea3a0d276f22b1033a",
+      "type": "withdrawal",
+      "category": "wallet",
+      "status": "pending",
+      "amount": 500,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "manual",
+      "paymentDetails": {
+        "bank": "System",
+        "account": "TokenInvestment"
+      },
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "WTH-1771032554958-54",
+      "description": "Withdrawal request of 500 USD",
+      "createdAt": "2026-02-14T01:29:14.959Z",
+      "updatedAt": "2026-02-14T01:29:14.959Z",
+      "__v": 0
+    },
+    {
+      "_id": "698fcff33a0d276f22b10367",
+      "user": "698fcff33a0d276f22b1035f",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 2000,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "card",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "DEP-1771032563976-909",
+      "description": "Deposit of 2000 USD",
+      "createdAt": "2026-02-14T01:29:23.977Z",
+      "updatedAt": "2026-02-14T01:29:23.977Z",
+      "__v": 0
+    },
+    {
+      "_id": "698fcff33a0d276f22b10371",
+      "user": "698fcff33a0d276f22b1035f",
+      "type": "withdrawal",
+      "category": "wallet",
+      "status": "pending",
+      "amount": 1000,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "manual",
+      "paymentDetails": {
+        "bank": "System",
+        "account": "CopyTradingAllocation"
+      },
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "WTH-1771032563988-737",
+      "description": "Withdrawal request of 1000 USD",
+      "createdAt": "2026-02-14T01:29:23.988Z",
+      "updatedAt": "2026-02-14T01:29:23.988Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb7155ea",
+      "user": "69b3b08cb3dd52dccb7155c0",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-1-REF-69b3b08db3dd52dccb7155d0",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:37:02.599Z",
+      "updatedAt": "2026-03-13T06:37:02.599Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb7155f6",
+      "user": "69b3b08bb3dd52dccb7155b0",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-2-REF-69b3b08db3dd52dccb7155d0",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:37:02.686Z",
+      "updatedAt": "2026-03-13T06:37:02.686Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb715602",
+      "user": "69b3b08ab3dd52dccb7155a0",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-3-REF-69b3b08db3dd52dccb7155d0",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:37:02.710Z",
+      "updatedAt": "2026-03-13T06:37:02.710Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb71560e",
+      "user": "69b3b089b3dd52dccb715590",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-4-REF-69b3b08db3dd52dccb7155d0",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:37:02.732Z",
+      "updatedAt": "2026-03-13T06:37:02.732Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b08eb3dd52dccb71561a",
+      "user": "69b3b087b3dd52dccb715580",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-5-REF-69b3b08db3dd52dccb7155d0",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:37:02.758Z",
+      "updatedAt": "2026-03-13T06:37:02.758Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0be6",
+      "user": "69b3b34b4de8fd6f005b0bc6",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-1-REF-69b3b34c4de8fd6f005b0bd1",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:48:45.277Z",
+      "updatedAt": "2026-03-13T06:48:45.277Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0bf2",
+      "user": "69b3b3494de8fd6f005b0bbb",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-2-REF-69b3b34c4de8fd6f005b0bd1",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:48:45.308Z",
+      "updatedAt": "2026-03-13T06:48:45.308Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0bfe",
+      "user": "69b3b3484de8fd6f005b0bb0",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-3-REF-69b3b34c4de8fd6f005b0bd1",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:48:45.333Z",
+      "updatedAt": "2026-03-13T06:48:45.333Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0c0a",
+      "user": "69b3b3474de8fd6f005b0ba5",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-4-REF-69b3b34c4de8fd6f005b0bd1",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:48:45.358Z",
+      "updatedAt": "2026-03-13T06:48:45.358Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b34d4de8fd6f005b0c16",
+      "user": "69b3b3464de8fd6f005b0b9a",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-5-REF-69b3b34c4de8fd6f005b0bd1",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:48:45.385Z",
+      "updatedAt": "2026-03-13T06:48:45.385Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a6238df",
+      "user": "69b3b3a98a573b873a6238bf",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-1-REF-69b3b3aa8a573b873a6238ca",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:50:20.134Z",
+      "updatedAt": "2026-03-13T06:50:20.134Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a6238eb",
+      "user": "69b3b3a88a573b873a6238b4",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-2-REF-69b3b3aa8a573b873a6238ca",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:50:20.163Z",
+      "updatedAt": "2026-03-13T06:50:20.163Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a6238f7",
+      "user": "69b3b3a78a573b873a6238a9",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-3-REF-69b3b3aa8a573b873a6238ca",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:50:20.193Z",
+      "updatedAt": "2026-03-13T06:50:20.193Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a623903",
+      "user": "69b3b3a68a573b873a62389e",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-4-REF-69b3b3aa8a573b873a6238ca",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:50:20.227Z",
+      "updatedAt": "2026-03-13T06:50:20.227Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b3b3ac8a573b873a62390f",
+      "user": "69b3b3a58a573b873a623893",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 24.900000000000002,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "referral_commission",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "LEVEL-5-REF-69b3b3aa8a573b873a6238ca",
+      "description": "Deposit of 24.900000000000002 USD",
+      "createdAt": "2026-03-13T06:50:20.260Z",
+      "updatedAt": "2026-03-13T06:50:20.260Z",
+      "__v": 0
+    },
+    {
+      "_id": "69b9c6153948c86543c91888",
+      "user": "69a16c8868783ef9309019e3",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 100,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "crypto",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "DEP-1773782549775-982",
+      "description": "Deposit of 100 USD",
+      "createdAt": "2026-03-17T21:22:29.792Z",
+      "updatedAt": "2026-03-17T21:22:29.792Z",
+      "__v": 0
+    },
+    {
+      "_id": "69c088ad488f2c1443e25b7b",
+      "user": "69a16c8868783ef9309019e3",
+      "type": "deposit",
+      "category": "wallet",
+      "status": "completed",
+      "amount": 100,
+      "currency": "USD",
+      "fee": 0,
+      "paymentMethod": "korapay",
+      "crypto": {
+        "confirmations": 0
+      },
+      "reference": "DEP-1774225581937-216",
+      "description": "Deposit of 100 USD",
+      "createdAt": "2026-03-23T00:26:21.971Z",
+      "updatedAt": "2026-03-23T00:26:21.971Z",
+      "__v": 0
+    }
+  ]
+}

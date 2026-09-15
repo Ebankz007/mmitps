@@ -1,0 +1,94 @@
+{
+  "orphans": [
+    {
+      "collection": "investments",
+      "docId": "698eed86f9a5bb57c7d075b7",
+      "reason": "phantom user ref user=698eed86f9a5bb57c7d075a3 → skipped"
+    },
+    {
+      "collection": "investments",
+      "docId": "698fcfea3a0d276f22b1034e",
+      "reason": "phantom user ref user=698fcfea3a0d276f22b1033a → skipped"
+    },
+    {
+      "collection": "amlchecks",
+      "docId": "698fbac0eaa4fc92b1bcdf3f",
+      "reason": "phantom user ref user=698fbac0eaa4fc92b1bcdf2c → skipped"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f1bf3b891c27d0a4cc6",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197 → skipped"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f30f3b891c27d0a4ccc",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197 → skipped"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f5ff3b891c27d0a4cdb",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197 → skipped"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f7ef3b891c27d0a4ce5",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197 → skipped"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906f97f3b891c27d0a4cfd",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197 → skipped"
+    },
+    {
+      "collection": "tradingbots",
+      "docId": "69906fccf3b891c27d0a4d1d",
+      "reason": "phantom user ref user=698f0ded4ba76f7e76b64197 → skipped"
+    },
+    {
+      "collection": "analyses",
+      "docId": "698ef0a6e62ce8d490ad720c",
+      "reason": "phantom author ref author=698ef0a6e62ce8d490ad7208 → skipped"
+    },
+    {
+      "collection": "invoices",
+      "docId": "6998a6b5e43afe454c886f63",
+      "reason": "phantom user ref user=699874869d0d8a0f58f0805b ($99 open) → skipped"
+    },
+    {
+      "collection": "invoices",
+      "docId": "6998a6f4e43afe454c886f8c",
+      "reason": "phantom user ref user=699874869d0d8a0f58f0805b ($99 open) → skipped"
+    },
+    {
+      "collection": "invoices",
+      "docId": "6998e82a6f3b007e7b6169be",
+      "reason": "phantom user ref user=699874869d0d8a0f58f0805b ($99 open) → skipped"
+    },
+    {
+      "collection": "invoices",
+      "docId": "6998e8656f3b007e7b6169ed",
+      "reason": "phantom user ref user=699874869d0d8a0f58f0805b ($99 open) → skipped"
+    },
+    {
+      "collection": "copysubscriptions",
+      "docId": "698eef89a1b5f71e842c5ea9",
+      "reason": "trader=null, provider_id NOT NULL → skipped"
+    },
+    {
+      "collection": "copysubscriptions",
+      "docId": "698fcff33a0d276f22b10373",
+      "reason": "trader=null, provider_id NOT NULL → skipped"
+    },
+    {
+      "collection": "courseprogresses",
+      "docId": "698eebd31106446c71cc374a",
+      "reason": "phantom user ref user=698eebd21106446c71cc373c → skipped"
+    },
+    {
+      "collection": "supporttickets",
+      "docId": "69c17f56d3b2c08464187b96",
+      "reason": "phantom user ref user=69a16c8868783ef9309019e3 → skipped"
+    }
+  ]
+}

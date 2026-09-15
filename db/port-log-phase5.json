@@ -1,0 +1,82 @@
+{
+  "orphans": [
+    {
+      "collection": "courses",
+      "docId": "698eeba833289febd6c75aaf",
+      "reason": "phantom instructor ref instructor=698eeba833289febd6c75aa7 → NULLed"
+    },
+    {
+      "collection": "courses",
+      "docId": "698eebd31106446c71cc3740",
+      "reason": "phantom instructor ref instructor=698eebd21106446c71cc3738 → NULLed"
+    },
+    {
+      "collection": "courseprogresses",
+      "docId": "698eebd31106446c71cc374a",
+      "reason": "phantom user ref user=698eebd21106446c71cc373c"
+    },
+    {
+      "collection": "supporttickets",
+      "docId": "69c17f56d3b2c08464187b96",
+      "reason": "phantom user ref user=69a16c8868783ef9309019e3"
+    },
+    {
+      "collection": "systemconfigs",
+      "docId": "698bf5b5044b6c79322b3b04",
+      "reason": "phantom lastModifiedBy ref → NULLed"
+    },
+    {
+      "collection": "systemconfigs",
+      "docId": "69a32b37822a23ae8c9ebf4e",
+      "reason": "phantom lastModifiedBy ref → NULLed"
+    },
+    {
+      "collection": "activitylogs",
+      "docId": "698ef3e3c6cb1eb92ca040b1",
+      "reason": "phantom user ref user=698ef3e3c6cb1eb92ca040a5 → NULLed"
+    },
+    {
+      "collection": "activitylogs",
+      "docId": "698fd4093a0d276f22b10388",
+      "reason": "phantom user ref user=698fd4083a0d276f22b1037c → NULLed"
+    },
+    {
+      "collection": "activitylogs",
+      "docId": "698fd4823a0d276f22b1039d",
+      "reason": "phantom user ref user=698fd4823a0d276f22b10391 → NULLed"
+    },
+    {
+      "collection": "activitylogs",
+      "docId": "69c2d3aa941d3c90c6848a73",
+      "reason": "phantom user ref user=69a16c8868783ef9309019e3 → NULLed"
+    },
+    {
+      "collection": "activitylogs",
+      "docId": "69c2d3aa941d3c90c6848a78",
+      "reason": "phantom user ref user=69a16c8868783ef9309019e3 → NULLed"
+    },
+    {
+      "collection": "activitylogs",
+      "docId": "69c2d45b941d3c90c6848a89",
+      "reason": "phantom user ref user=69a16c8868783ef9309019e3 → NULLed"
+    },
+    {
+      "collection": "activitylogs",
+      "docId": "69c2d45b941d3c90c6848a8e",
+      "reason": "phantom user ref user=69a16c8868783ef9309019e3 → NULLed"
+    },
+    {
+      "collection": "newsarticles",
+      "docId": "698ef0a6e62ce8d490ad720f",
+      "reason": "phantom author ref author=698ef0a6e62ce8d490ad7208 → NULLed"
+    }
+  ],
+  "repairs": [
+    {
+      "collection": "systemconfigs",
+      "docId": "69b8f4f2f64e0d3e6b0f5f7f",
+      "key": "geo_restrictions",
+      "reason": "Mongo value was literal string \"[object Object]\" (latent Mongo bug) — ported faithfully, then repaired to DEFAULT_GEO shape via db/fix-geo.js (2026-09-12). Verified: global enabled, mlm enabled. Reversible by re-running db/port-phase5.js."
+    }
+  ]
+}

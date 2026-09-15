@@ -1,0 +1,85 @@
+{
+  "name": "mmitps-trading-platform",
+  "version": "1.0.0",
+  "description": "Multi-Market Institutional Trading Platform System - Complete trading education and analytics platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "concurrently \"npm run server\" \"npm run frontend\"",
+    "server": "nodemon backend/server.js",
+    "frontend": "cd frontend-next && npm run dev",
+    "test": "jest",
+    "lint": "eslint \"backend/**/*.js\"",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "build": "cd frontend-next && npm run build",
+    "prod:start": "pm2 start backend/server.js --name mmitps-backend -i max",
+    "prod:stop": "pm2 stop mmitps-backend",
+    "prod:restart": "pm2 restart mmitps-backend",
+    "docker:build": "docker build -t mmitps .",
+    "docker:run": "docker run -p 3000:3000 --env-file .env mmitps"
+  },
+  "keywords": [
+    "trading",
+    "forex",
+    "cryptocurrency",
+    "education",
+    "mlm",
+    "fintech",
+    "analytics",
+    "copy-trading"
+  ],
+  "author": "MMITPS INC",
+  "license": "PROPRIETARY",
+  "dependencies": {
+    "@mux/mux-node": "^12.8.1",
+    "axios": "^1.13.6",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.3.1",
+    "drizzle-orm": "^0.45.2",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.2.0",
+    "hpp": "^0.2.3",
+    "ioredis": "^5.3.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.1",
+    "pg": "^8.23.0",
+    "qrcode": "^1.5.3",
+    "sanitize-html": "^2.17.7",
+    "sharp": "^0.33.0",
+    "socket.io": "^4.8.3",
+    "speakeasy": "^2.0.0",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0",
+    "xss-clean": "^0.1.4",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "concurrently": "^8.2.2",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^8.55.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.1.1",
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mmitps/platform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mmitps/platform/issues"
+  },
+  "homepage": "https://mmitps.com"
+}
