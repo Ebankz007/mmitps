@@ -1,6 +1,6 @@
 /**
  * PostgreSQL Base Repository (Drizzle ORM)
- * Drop-in replacement for the MongoDB BaseRepository — same method names,
+ * Drop-in replacement for the legacy BaseRepository — same method names,
  * same return shapes (camelCase keys, { results, pagination } for paginate).
  *
  * Differences from the Mongo version:

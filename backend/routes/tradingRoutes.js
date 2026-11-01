@@ -1,8 +1,8 @@
 /**
  * Trading routes — PostgreSQL edition.
  * Signals / copy trading / trading accounts run on the pg stack (pg protect +
- * pg controllers). AI analysis, risk control, VPS & live-streams remain
- * MongoDB-backed → routes/tradingMiscRoutes.js (mounted at /api/v1/trading too).
+ * pg controllers). AI analysis, risk control, VPS & live-streams run on
+ * routes/tradingMiscRoutes.js (mounted at /api/v1/trading too).
  */
 const express = require('express');
 const router = express.Router();

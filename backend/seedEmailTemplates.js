@@ -1,9 +1,8 @@
 /**
  * seedEmailTemplates.js
- * Seeds 20 default HTML email templates into MongoDB.
- * Run: node backend/seedEmailTemplates.js
- * NOTE: MongoDB-era seed. DEFAULT_TEMPLATES is consumed by EmailTemplateService (PG).
- * The Mongo seed path is obsolete (models/ removed) — requires fail with a clear error.
+ * Default email template definitions (PostgreSQL era).
+ * DEFAULT_TEMPLATES is consumed by EmailTemplateService (PG).
+ * Run: node backend/seedEmailTemplates.js  (no-op — seeding handled by PG service)
  */
 
 const dotenv = require('dotenv');
@@ -451,46 +450,5 @@ const DEFAULT_TEMPLATES = [
     }
 ];
 
-// ─── Seed Function ────────────────────────────────────────────────────────────
-const seedTemplates = async () => {
-    try {
-        const mongoose = require('mongoose');
-        const EmailTemplate = require('./models/System/EmailTemplate');
-        const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mmitps';
-        console.log('dY" Connecting to MongoDB...');
-        await mongoose.connect(MONGODB_URI);
-        console.log('✅ Connected.\n');
-
-        let created = 0, updated = 0;
-
-        for (const tmpl of DEFAULT_TEMPLATES) {
-            const existing = await EmailTemplate.findOne({ key: tmpl.key });
-            if (existing) {
-                // Only update metadata; don't overwrite admin-edited subject/htmlBody
-                await EmailTemplate.updateOne({ key: tmpl.key }, {
-                    $set: { name: tmpl.name, category: tmpl.category, description: tmpl.description, variables: tmpl.variables }
-                });
-                console.log(`  ↩️  Updated metadata: ${tmpl.key}`);
-                updated++;
-            } else {
-                await EmailTemplate.create(tmpl);
-                console.log(`  ✅ Created: ${tmpl.key}`);
-                created++;
-            }
-        }
-
-        console.log(`\n🎉 Done! Created: ${created} | Updated: ${updated} | Total: ${DEFAULT_TEMPLATES.length}`);
-        process.exit(0);
-    } catch (err) {
-        console.error('❌ Seed error:', err);
-        process.exit(1);
-    }
-};
-
+// ─── Module Export ─────────────────────────────────────────────────────────────
 module.exports = { DEFAULT_TEMPLATES };
-
-// Only auto-seed when run directly (node seedEmailTemplates.js)
-// When required by other modules, just export DEFAULT_TEMPLATES
-if (require.main === module) {
-    seedTemplates();
-}

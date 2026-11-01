@@ -270,7 +270,7 @@ export default function AdminSettingsPage() {
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.5rem" }}>
                                     <div>
                                         <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#fff" }}>Database Infrastructure</h3>
-                                        <p style={{ fontSize: "12px", color: "var(--color-text-muted)" }}>Health status of the primary MongoDB instance.</p>
+                                        <p style={{ fontSize: "12px", color: "var(--color-text-muted)" }}>Health status of the primary database instance.</p>
                                     </div>
                                     <div style={{
                                         padding: "6px 12px",
@@ -354,7 +354,7 @@ export default function AdminSettingsPage() {
                                 <h4 style={{ fontSize: "13px", fontWeight: 700, color: "var(--color-text-muted)", marginBottom: "8px" }}>Watchdog Recommendations</h4>
                                 <ul style={{ fontSize: "12px", color: "var(--color-text-secondary)", paddingLeft: "20px" }}>
                                     <li style={{ marginBottom: "6px" }}>If latency exceeds 500ms, consider scaling your database cluster or checking network congestion.</li>
-                                    <li style={{ marginBottom: "6px" }}>Buffer timeouts are usually caused by an unreachable MongoDB instance (Check if service is running).</li>
+                                    <li style={{ marginBottom: "6px" }}>Buffer timeouts are usually caused by an unreachable database instance (Check if service is running).</li>
                                     <li>Automated repair will attempt to restart the connection pool and clear buffered commands.</li>
                                 </ul>
                             </div>

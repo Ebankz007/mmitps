@@ -24,8 +24,7 @@ pool.on('error', (err) => {
 const db = drizzle(pool);
 
 /**
- * Health check — mirrors HealthService for MongoDB.
- * Returns { ok, latencyMs } or throws.
+ * Health check — returns { ok, latencyMs } or throws.
  */
 async function pingDatabase() {
   const start = Date.now();

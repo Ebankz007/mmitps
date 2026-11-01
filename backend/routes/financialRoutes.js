@@ -1,7 +1,7 @@
 /**
  * Financial routes — PostgreSQL edition.
  * Wallet / transactions / coupons now run on the pg stack (pg protect + pg controllers).
- * Payouts moved to routes/payoutRoutes.js (still MongoDB-backed).
+ * Payouts moved to routes/payoutRoutes.js (pg stack).
  */
 const express = require('express');
 const router = express.Router();

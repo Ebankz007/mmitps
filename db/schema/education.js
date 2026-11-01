@@ -1,6 +1,6 @@
 // db/schema/education.js — Education domain tables
 // Migrated from: backend/models/Education/*.js
-// Course modules/lessons were embedded subdocuments in MongoDB — now child tables.
+// Course modules/lessons are child tables (PostgreSQL).
 const { pgTable, pgEnum, uuid, text, timestamp, boolean, numeric, integer, jsonb, index, uniqueIndex } = require('drizzle-orm/pg-core');
 const { users } = require('./core');
 const { plans } = require('./core');
