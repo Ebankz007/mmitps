@@ -1,58 +1,35 @@
 const BaseRepository = require('./BaseRepository');
-const User = require('../models/User');
+const { users } = require('../../db/schema/core');
 
 class UserRepository extends BaseRepository {
-    constructor() {
-        super(User);
-    }
+  constructor() {
+    super(users, { defaultExclude: ['password'] });
+  }
 
-    /**
-     * Find user by email
-     * @param {String} email
-     * @param {Object} options - Query options
-     * @returns {Promise<Document>}
-     */
-    async findByEmail(email, options = {}) {
-        return this.findOne({ email }, options);
-    }
+  /** Find user by email (password excluded). */
+  async findByEmail(email, options = {}) {
+    return this.findOne({ email }, options);
+  }
 
-    /**
-     * Find user by email including password
-     * @param {String} email
-     * @returns {Promise<Document>}
-     */
-    async findByEmailWithPassword(email) {
-        return this.model.findOne({ email }).select('+password');
-    }
+  /** Find user by email including password (for auth). */
+  async findByEmailWithPassword(email) {
+    return this.findOne({ email }, { select: '+password' });
+  }
 
-    /**
-     * Find user by ID including password
-     * @param {String} id
-     * @returns {Promise<Document>}
-     */
-    async findByIdWithPassword(id) {
-        return this.model.findById(id).select('+password');
-    }
+  /** Find user by ID including password (for auth). */
+  async findByIdWithPassword(id) {
+    return this.findById(id, { select: '+password' });
+  }
 
-    /**
-     * Check if email exists
-     * @param {String} email
-     * @returns {Promise<Boolean>}
-     */
-    async emailExists(email) {
-        const count = await this.model.countDocuments({ email });
-        return count > 0;
-    }
+  /** Check if email exists. */
+  async emailExists(email) {
+    return this.exists({ email });
+  }
 
-    /**
-     * Find users by role
-     * @param {String} role
-     * @param {Object} options
-     * @returns {Promise<Object>} Paginated results
-     */
-    async findByRole(role, options = {}) {
-        return this.paginate({ role }, options);
-    }
+  /** Find users by role. */
+  async findByRole(role, options = {}) {
+    return this.paginate({ role }, options);
+  }
 }
 
 module.exports = new UserRepository();

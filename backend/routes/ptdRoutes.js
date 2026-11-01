@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const ptdController = require("../controllers/ptdController");
-const { protect } = require("../middleware/pg/auth");
+const { protect } = require("../middleware/auth");
 
 // All routes require authentication
 router.use(protect);
@@ -36,3 +36,4 @@ router.post("/broker/trade", ptdController.executeTrade);
 router.get("/broker/trades", ptdController.getTradeLog);
 
 module.exports = router;
+

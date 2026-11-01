@@ -1,6 +1,6 @@
 const socketIO = require('socket.io');
-const TokenService = require('./services/pg/TokenService');
-const UserService = require('./services/pg/UserService');
+const TokenService = require('./services/TokenService');
+const UserService = require('./services/UserService');
 
 const ADMIN_ROLES = ['admin', 'super_admin', 'moderator'];
 
@@ -205,3 +205,4 @@ class WebSocketServer {
 }
 
 module.exports = WebSocketServer;
+

@@ -5,9 +5,9 @@ const {
     createBlock,
     updateBlock,
     deleteBlock
-} = require('../controllers/pg/cmsController');
+} = require('../controllers/cmsController');
 const { getPageContext, getBatchContext } = require('../controllers/UniversalPageController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -37,3 +37,5 @@ router.get('/page-context/:pageId', protect, getPageContext);
 router.post('/page-context/batch', protect, getBatchContext);
 
 module.exports = router;
+
+

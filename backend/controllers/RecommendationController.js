@@ -1,4 +1,7 @@
-const RecommendationService = require('../services/ai/RecommendationService');
+/**
+ * RecommendationController — PostgreSQL edition.
+ */
+const RecommendationService = require('../services/RecommendationService');
 const ApiResponse = require('../utils/ApiResponse');
 
 /**
@@ -6,9 +9,10 @@ const ApiResponse = require('../utils/ApiResponse');
  */
 exports.getRecommendations = async (req, res, next) => {
     try {
-        const insights = await RecommendationService.getInsights(req.user._id);
+        const insights = await RecommendationService.getInsights(req.user.id);
         res.status(200).json(new ApiResponse(true, insights, 'Personalized recommendations retrieved'));
     } catch (error) {
         next(error);
     }
 };
+

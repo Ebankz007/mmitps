@@ -1,285 +1,132 @@
-const Menu = require('../models/CMS/Menu');
-const Page = require('../models/CMS/Page');
-const Media = require('../models/CMS/Media');
-const NewsArticle = require('../models/News/NewsArticle');
-const ContentBlock = require('../models/ContentBlock');
-const SiteStatus = require('../models/System/SiteStatus');
-const AnnealingService = require('../services/system/AnnealingService');
-const path = require('path');
-const fs = require('fs');
-
 /**
- * @desc    Get all menus
- * @route   GET /api/v1/admin/cms/menus
+ * adminCMSController — PostgreSQL edition.
+ * Mirrors the Mongo controllers/adminCMSController (menus, pages, media,
+ * site status, annealing, maintenance, news, blocks).
  */
-exports.getMenus = async (req, res) => {
-    try {
-        const menus = await Menu.find().sort('name');
-        res.status(200).json({ success: true, data: menus });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+const MenuRepository = require('../repositories/MenuRepository');
+const PageRepository = require('../repositories/PageRepository');
+const MediaRepository = require('../repositories/MediaRepository');
+const SiteStatusRepository = require('../repositories/SiteStatusRepository');
+const AnnealingService = require('../services/AnnealingService');
+const NewsRepository = require('../repositories/NewsRepository');
+const ContentBlockRepository = require('../repositories/ContentBlockRepository');
+const catchAsync = require('../utils/catchAsync');
+const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
-/**
- * @desc    Create/Update Menu
- * @route   POST /api/v1/admin/cms/menus
- */
-exports.upsertMenu = async (req, res) => {
-    try {
-        const { name, location, items, isActive } = req.body;
-        let menu = await Menu.findOne({ location });
+// ─── Menus ─────────────────────────────────────────────────────────────────
 
-        if (menu) {
-            menu.name = name || menu.name;
-            menu.items = items || menu.items;
-            menu.isActive = isActive !== undefined ? isActive : menu.isActive;
-            await menu.save();
-        } else {
-            menu = await Menu.create({ name, location, items, isActive });
-        }
+exports.getMenus = catchAsync(async (req, res) => {
+  const menus = await MenuRepository.findAll({});
+  res.status(200).json(new ApiResponse(true, menus, 'Menus retrieved'));
+});
 
-        res.status(200).json({ success: true, data: menu });
-    } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-};
+exports.upsertMenu = catchAsync(async (req, res) => {
+  const { location, ...data } = req.body;
+  const menu = await MenuRepository.upsertByLocation(location, data);
+  res.status(200).json(new ApiResponse(true, menu, 'Menu upserted'));
+});
 
-/**
- * @desc    Get all pages
- * @route   GET /api/v1/admin/cms/pages
- */
-exports.getPages = async (req, res) => {
-    try {
-        const pages = await Page.find().sort('-createdAt');
-        res.status(200).json({ success: true, data: pages });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+// ─── Pages ─────────────────────────────────────────────────────────────────
 
-/**
- * @desc    Create Page
- * @route   POST /api/v1/admin/cms/pages
- */
-exports.createPage = async (req, res) => {
-    try {
-        const page = await Page.create(req.body);
-        res.status(201).json({ success: true, data: page });
-    } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-};
+exports.getPages = catchAsync(async (req, res) => {
+  const pages = await PageRepository.findAll({}, { sort: 'createdAt' });
+  res.status(200).json(new ApiResponse(true, pages, 'Pages retrieved'));
+});
 
-/**
- * @desc    Get single page
- * @route   GET /api/v1/admin/cms/pages/:id
- */
-exports.getPage = async (req, res) => {
-    try {
-        const page = await Page.findById(req.params.id);
-        if (!page) {
-            return res.status(404).json({ success: false, message: 'Page not found' });
-        }
-        res.status(200).json({ success: true, data: page });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.getPage = catchAsync(async (req, res) => {
+  const page = await PageRepository.findById(req.params.id);
+  if (!page) throw new ApiError(404, 'Page not found');
+  res.status(200).json(new ApiResponse(true, page, 'Page retrieved'));
+});
 
-/**
- * @desc    Update Page
- * @route   PUT /api/v1/admin/cms/pages/:id
- */
-exports.updatePage = async (req, res) => {
-    try {
-        const page = await Page.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        });
-        if (!page) {
-            return res.status(404).json({ success: false, message: 'Page not found' });
-        }
-        res.status(200).json({ success: true, data: page });
-    } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-};
+exports.createPage = catchAsync(async (req, res) => {
+  const page = await PageRepository.create(req.body);
+  res.status(201).json(new ApiResponse(true, page, 'Page created'));
+});
 
-/**
- * @desc    Delete Page
- * @route   DELETE /api/v1/admin/cms/pages/:id
- */
-exports.deletePage = async (req, res) => {
-    try {
-        const page = await Page.findById(req.params.id);
-        if (!page) {
-            return res.status(404).json({ success: false, message: 'Page not found' });
-        }
-        await page.deleteOne();
-        res.status(200).json({ success: true, data: {} });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.updatePage = catchAsync(async (req, res) => {
+  const page = await PageRepository.update(req.params.id, req.body);
+  if (!page) throw new ApiError(404, 'Page not found');
+  res.status(200).json(new ApiResponse(true, page, 'Page updated'));
+});
 
-/**
- * @desc    Upload Media
- * @route   POST /api/v1/admin/cms/media/upload
- */
-exports.uploadMedia = async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'Please upload a file' });
-        }
+exports.deletePage = catchAsync(async (req, res) => {
+  const deleted = await PageRepository.delete(req.params.id);
+  if (!deleted) throw new ApiError(404, 'Page not found');
+  res.status(200).json(new ApiResponse(true, null, 'Page deleted'));
+});
 
-        const media = await Media.create({
-            filename: req.file.filename,
-            originalname: req.file.originalname,
-            mimetype: req.file.mimetype,
-            size: req.file.size,
-            path: req.file.path,
-            url: `/uploads/${req.file.filename}`,
-            category: req.file.mimetype.startsWith('image') ? 'image' :
-                req.file.mimetype.startsWith('video') ? 'video' : 'document',
-            uploadedBy: req.user.id
-        });
+// ─── Media ─────────────────────────────────────────────────────────────────
 
-        res.status(201).json({ success: true, data: media });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.getMedia = catchAsync(async (req, res) => {
+  const media = await MediaRepository.findAll({}, { sort: '-createdAt' });
+  res.status(200).json(new ApiResponse(true, media, 'Media retrieved'));
+});
 
-/**
- * @desc    Get all media
- * @route   GET /api/v1/admin/cms/media
- */
-exports.getMedia = async (req, res) => {
-    try {
-        const media = await Media.find().sort('-createdAt');
-        res.status(200).json({ success: true, data: media });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.getMediaById = catchAsync(async (req, res) => {
+  const media = await MediaRepository.findById(req.params.id);
+  if (!media) throw new ApiError(404, 'Media not found');
+  res.status(200).json(new ApiResponse(true, media, 'Media retrieved'));
+});
 
-/**
- * @desc    Update Media metadata
- * @route   PUT /api/v1/admin/cms/media/:id
- */
-exports.updateMedia = async (req, res) => {
-    try {
-        const media = await Media.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        });
-        if (!media) {
-            return res.status(404).json({ success: false, message: 'Media not found' });
-        }
-        res.status(200).json({ success: true, data: media });
-    } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-};
+exports.uploadMedia = catchAsync(async (req, res) => {
+  if (!req.file) throw new ApiError(400, 'No file uploaded');
+  const media = await MediaRepository.create({
+    filename: req.file.filename,
+    originalname: req.file.originalname,
+    mimetype: req.file.mimetype,
+    size: req.file.size,
+    path: `/uploads/cms/${req.file.filename}`,
+    url: `/uploads/cms/${req.file.filename}`,
+    uploadedById: req.user.id,
+  });
+  res.status(201).json(new ApiResponse(true, media, 'Media uploaded'));
+});
 
-/**
- * @desc    Delete Media
- * @route   DELETE /api/v1/admin/cms/media/:id
- */
-exports.deleteMedia = async (req, res) => {
-    try {
-        const media = await Media.findById(req.params.id);
-        if (!media) {
-            return res.status(404).json({ success: false, message: 'Media not found' });
-        }
+exports.updateMedia = catchAsync(async (req, res) => {
+  const media = await MediaRepository.update(req.params.id, req.body);
+  if (!media) throw new ApiError(404, 'Media not found');
+  res.status(200).json(new ApiResponse(true, media, 'Media updated'));
+});
 
-        // Delete file from storage
-        const filePath = path.join(__dirname, '..', media.path);
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
+exports.deleteMedia = catchAsync(async (req, res) => {
+  const deleted = await MediaRepository.delete(req.params.id);
+  if (!deleted) throw new ApiError(404, 'Media not found');
+  res.status(200).json(new ApiResponse(true, null, 'Media deleted'));
+});
 
-        await media.deleteOne();
-        res.status(200).json({ success: true, data: {} });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+// ─── Site Status & Annealing ───────────────────────────────────────────────
 
-/**
- * @desc    Get Site Status & Health
- * @route   GET /api/v1/admin/cms/status
- */
-exports.getSiteStatus = async (req, res) => {
-    try {
-        let status = await SiteStatus.findOne().sort('-createdAt');
-        if (!status) {
-            status = await SiteStatus.create({ version: '2.0.0' });
-        }
-        res.status(200).json({ success: true, data: status });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.getSiteStatus = catchAsync(async (req, res) => {
+  const status = await SiteStatusRepository.getOrCreate();
+  res.status(200).json(new ApiResponse(true, status, 'Site status retrieved'));
+});
 
-/**
- * @desc    Trigger Self-Annealing
- * @route   POST /api/v1/admin/cms/anneal
- */
-exports.triggerAnnealing = async (req, res) => {
-    try {
-        const reports = await AnnealingService.runFullAnnealing();
-        res.status(200).json({ success: true, data: reports });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.triggerAnnealing = catchAsync(async (req, res) => {
+  const status = await AnnealingService.runFullAnnealing();
+  res.status(200).json(new ApiResponse(true, status, 'Annealing complete'));
+});
 
-/**
- * @desc    Toggle Maintenance Mode
- * @route   PUT /api/v1/admin/cms/maintenance
- */
-exports.toggleMaintenance = async (req, res) => {
-    try {
-        const { isMaintenanceMode, maintenanceMessage } = req.body;
-        let status = await SiteStatus.findOne();
-        if (!status) status = new SiteStatus();
+exports.toggleMaintenance = catchAsync(async (req, res) => {
+  const { enabled, message } = req.body;
+  const status = await SiteStatusRepository.getOrCreate();
+  const updated = await SiteStatusRepository.update(status.id, {
+    isMaintenanceMode: enabled !== undefined ? enabled : !status.isMaintenanceMode,
+    maintenanceMessage: message || status.maintenanceMessage,
+  });
+  res.status(200).json(new ApiResponse(true, updated, 'Maintenance mode updated'));
+});
 
-        status.isMaintenanceMode = isMaintenanceMode;
-        if (maintenanceMessage) status.maintenanceMessage = maintenanceMessage;
+// ─── News & Blocks (admin list views) ──────────────────────────────────────
 
-        await status.save();
-        res.status(200).json({ success: true, data: status });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.getNewsArticles = catchAsync(async (req, res) => {
+  const articles = await NewsRepository.findAll({}, { populate: 'author', sort: '-createdAt' });
+  res.status(200).json(new ApiResponse(true, articles, 'News articles retrieved'));
+});
 
-/**
- * @desc    Get all News Articles
- * @route   GET /api/v1/admin/cms/news
- */
-exports.getNewsArticles = async (req, res) => {
-    try {
-        const articles = await NewsArticle.find().sort('-createdAt');
-        res.status(200).json({ success: true, count: articles.length, data: articles });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.getContentBlocks = catchAsync(async (req, res) => {
+  const blocks = await ContentBlockRepository.findAll({}, { sort: 'createdAt' });
+  res.status(200).json(new ApiResponse(true, blocks, 'Content blocks retrieved'));
+});
 
-/**
- * @desc    Get all Content Blocks (Events, etc)
- * @route   GET /api/v1/admin/cms/blocks
- */
-exports.getContentBlocks = async (req, res) => {
-    try {
-        const { type } = req.query;
-        const filter = type ? { type } : {};
-        const blocks = await ContentBlock.find(filter).sort('-createdAt');
-        res.status(200).json({ success: true, count: blocks.length, data: blocks });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};

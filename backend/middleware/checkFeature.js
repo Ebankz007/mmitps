@@ -1,9 +1,9 @@
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
-
-// We need to ensure models are loaded
-try { require('../models/Subscription'); } catch (e) { }
-try { require('../models/Plan'); } catch (e) { }
+/**
+ * checkFeature — PostgreSQL edition.
+ * Gates feature access behind an active subscription whose plan grants the feature.
+ */
+const SubscriptionRepository = require('../repositories/SubscriptionRepository');
+const PlanRepository = require('../repositories/PlanRepository');
 
 exports.checkFeature = (featureName) => {
     return async (req, res, next) => {
@@ -13,8 +13,7 @@ exports.checkFeature = (featureName) => {
                 return next();
             }
 
-            const Subscription = mongoose.model('Subscription');
-            const sub = await Subscription.findOne({ user: req.user._id }).populate('plan');
+            const sub = await SubscriptionRepository.findActiveByUser(req.user.id);
 
             if (!sub) {
                 return res.status(403).json({
@@ -32,13 +31,13 @@ exports.checkFeature = (featureName) => {
                 });
             }
 
-            if (!sub.plan) {
+            const plan = await PlanRepository.findById(sub.planId);
+            if (!plan) {
                 return res.status(403).json({ success: false, message: 'Plan not found for subscription' });
             }
 
-            // Check feature in Plan
-            // Plan.features is a Map in Mongoose
-            const hasFeature = sub.plan.features.get(featureName);
+            // Plan.features is a JSONB object in PG
+            const hasFeature = plan.features && plan.features[featureName];
 
             if (!hasFeature) {
                 return res.status(403).json({
@@ -55,3 +54,4 @@ exports.checkFeature = (featureName) => {
         }
     };
 };
+

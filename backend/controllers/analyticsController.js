@@ -1,4 +1,4 @@
-const AnalyticsService = require('../services/admin/AnalyticsService');
+const AnalyticsService = require('../services/AnalyticsService');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 
@@ -16,3 +16,4 @@ exports.getTradingStats = catchAsync(async (req, res) => {
     const stats = await AnalyticsService.getTradingStats();
     res.status(200).json(new ApiResponse(true, stats, 'Trading analytics retrieved'));
 });
+

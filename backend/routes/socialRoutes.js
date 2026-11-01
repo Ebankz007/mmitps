@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const socialTradingController = require('../controllers/pg/socialTradingController');
-const { protect } = require('../middleware/pg/auth');
+const socialTradingController = require('../controllers/socialTradingController');
+const { protect } = require('../middleware/auth');
 
 // Public routes
 router.get('/leaderboard', socialTradingController.getLeaderboard);
@@ -22,3 +22,5 @@ router.get('/signals/feed', protect, socialTradingController.getSignalFeed);
 router.put('/signals/:id/close', protect, socialTradingController.closeSignal);
 
 module.exports = router;
+
+

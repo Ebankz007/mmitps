@@ -4,8 +4,8 @@
  */
 const express = require('express');
 const router = express.Router();
-const payoutController = require('../controllers/pg/payoutController');
-const { protect } = require('../middleware/pg/auth');
+const payoutController = require('../controllers/payoutController');
+const { protect } = require('../middleware/auth');
 
 router.use(protect);
 
@@ -14,3 +14,4 @@ router.get('/my', payoutController.getMyPayouts);
 router.post('/:id/cancel', payoutController.cancelPayout);
 
 module.exports = router;
+

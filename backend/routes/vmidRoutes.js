@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const vmidController = require("../controllers/vmidController");
-const { protect } = require("../middleware/pg/auth");
+const { protect } = require("../middleware/auth");
 
 // All VMID routes require authentication
 router.use(protect);
@@ -20,3 +20,4 @@ router.get("/streams/active", vmidController.getActiveStreams);
 router.post("/streams/create", vmidController.createLiveStream);
 
 module.exports = router;
+

@@ -1,5 +1,5 @@
-const VPSService = require('../services/trading/VPSService');
-const LiveStreamService = require('../services/trading/LiveStreamService');
+const VPSService = require('../services/VPSService');
+const LiveStreamService = require('../services/LiveStreamService');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 
@@ -20,3 +20,4 @@ exports.getLiveStreams = catchAsync(async (req, res) => {
     const streams = await LiveStreamService.getActiveStreams();
     res.status(200).json(new ApiResponse(true, streams));
 });
+

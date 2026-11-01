@@ -1,4 +1,7 @@
-const SentimentService = require('../services/ai/SentimentService');
+/**
+ * SentimentController — PostgreSQL edition.
+ */
+const SentimentService = require('../services/SentimentService');
 const ApiResponse = require('../utils/ApiResponse');
 
 /**

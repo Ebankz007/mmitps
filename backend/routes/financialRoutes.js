@@ -5,10 +5,10 @@
  */
 const express = require('express');
 const router = express.Router();
-const walletController = require('../controllers/pg/walletController');
-const transactionController = require('../controllers/pg/transactionController');
-const couponController = require('../controllers/pg/couponController');
-const { protect } = require('../middleware/pg/auth');
+const walletController = require('../controllers/walletController');
+const transactionController = require('../controllers/transactionController');
+const couponController = require('../controllers/couponController');
+const { protect } = require('../middleware/auth');
 
 router.use(protect);
 
@@ -32,3 +32,4 @@ router.get('/transactions/:id', transactionController.getTransaction);
 router.get('/currencies', walletController.getSupportedCurrencies);
 
 module.exports = router;
+

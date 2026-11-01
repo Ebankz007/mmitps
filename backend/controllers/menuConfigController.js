@@ -1,30 +1,44 @@
-const MenuConfig = require('../models/MenuConfig');
+/**
+ * MenuConfigController — PostgreSQL edition.
+ * Backed by the menus table (location-keyed, unique per location).
+ */
+const MenuRepository = require('../repositories/MenuRepository');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
 
 exports.getMenuConfigs = catchAsync(async (req, res) => {
-    const configs = await MenuConfig.find();
-    res.status(200).json(new ApiResponse(true, configs, 'Menu configurations retrieved successfully'));
+    const menus = await MenuRepository.findAll({}, { sort: 'location' });
+    res.status(200).json(new ApiResponse(true, menus, 'Menu configs retrieved'));
 });
 
 exports.updateMenuConfig = catchAsync(async (req, res) => {
     const { label } = req.params;
-    const updateData = req.body;
+    const { items, isActive, name } = req.body;
 
-    let config = await MenuConfig.findOne({ label });
-
-    if (config) {
-        config = await MenuConfig.findOneAndUpdate({ label }, updateData, { new: true });
-    } else {
-        config = await MenuConfig.create({ label, ...updateData });
+    const existing = await MenuRepository.findByLocation(label);
+    if (!existing) {
+        throw new ApiError(404, `Menu config '${label}' not found`);
     }
 
-    res.status(200).json(new ApiResponse(true, config, 'Menu configuration updated successfully'));
+    const updated = await MenuRepository.update(existing.id, {
+        ...(items !== undefined ? { items } : {}),
+        ...(isActive !== undefined ? { isActive } : {}),
+        ...(name !== undefined ? { name } : {}),
+    });
+
+    res.status(200).json(new ApiResponse(true, updated, `Menu config '${label}' updated`));
 });
 
 exports.deleteMenuConfig = catchAsync(async (req, res) => {
     const { label } = req.params;
-    await MenuConfig.findOneAndDelete({ label });
-    res.status(200).json(new ApiResponse(true, null, 'Menu configuration deleted successfully'));
+
+    const existing = await MenuRepository.findByLocation(label);
+    if (!existing) {
+        throw new ApiError(404, `Menu config '${label}' not found`);
+    }
+
+    await MenuRepository.delete(existing.id);
+    res.status(200).json(new ApiResponse(true, null, `Menu config '${label}' deleted`));
 });
+

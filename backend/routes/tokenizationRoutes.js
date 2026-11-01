@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const tokenizationController = require('../controllers/pg/tokenizationController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const tokenizationController = require('../controllers/tokenizationController');
+const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
 
@@ -16,3 +16,4 @@ router.post('/invest', tokenizationController.invest);
 router.post('/pools', authorize('admin', 'super_admin'), tokenizationController.createPool);
 
 module.exports = router;
+

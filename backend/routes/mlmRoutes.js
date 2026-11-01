@@ -4,8 +4,8 @@
  */
 const express = require('express');
 const router = express.Router();
-const mlmController = require('../controllers/pg/mlmController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const mlmController = require('../controllers/mlmController');
+const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
 
@@ -33,3 +33,4 @@ router.post('/ranks/evaluate-all', authorize('admin', 'super_admin'), mlmControl
 router.get('/rank-history/:userId', authorize('admin', 'super_admin'), mlmController.getUserRankHistory);
 
 module.exports = router;
+

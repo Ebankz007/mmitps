@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const supportController = require('../controllers/pg/supportController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const supportController = require('../controllers/supportController');
+const { protect, authorize } = require('../middleware/auth');
 
 // User routes - all require login
 router.use(protect);
@@ -21,3 +21,5 @@ router.put('/admin/:id/status', supportController.updateStatus);
 router.post('/admin/:id/note', supportController.addInternalNote);
 
 module.exports = router;
+
+

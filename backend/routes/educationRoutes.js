@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const educationController = require('../controllers/pg/educationController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const educationController = require('../controllers/educationController');
+const { protect, authorize } = require('../middleware/auth');
 
 // Public routes (for authenticated users)
 router.get('/courses', educationController.listCourses);
@@ -22,3 +22,5 @@ router.get('/stats', educationController.getStats);
 router.post('/courses/:courseId/lessons/:lessonId/complete', educationController.completeLesson);
 
 module.exports = router;
+
+

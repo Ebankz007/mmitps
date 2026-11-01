@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const logger = require('./utils/logger');
-const COTDataMinerService = require('./services/trading/COTDataMinerService');
+const COTDataMinerService = require('./services/COTDataMinerService');
 
 /**
  * MMITPS Cron Job Orchestrator
@@ -40,3 +40,4 @@ class JobScheduler {
 }
 
 module.exports = new JobScheduler();
+

@@ -1,31 +1,33 @@
+/**
+ * TradingBotRepository — PostgreSQL edition.
+ * Mirrors the Mongo repo (getActiveBots, findByUser, findByIdAndUser).
+ */
 const BaseRepository = require('./BaseRepository');
-const TradingBot = require('../models/Trading/TradingBot');
+const { tradingBots } = require('../../db/schema/trading');
+const { users } = require('../../db/schema/core');
+const { eq } = require('drizzle-orm');
 
 class TradingBotRepository extends BaseRepository {
-    constructor() {
-        super(TradingBot);
-    }
+  constructor() {
+    super(tradingBots, {
+      relations: {
+        user: { table: users, on: eq(tradingBots.userId, users.id) },
+      },
+    });
+  }
 
-    /**
-     * Get active bots for processing
-     */
-    async getActiveBots() {
-        return this.model.find({ status: 'active' }).populate('user');
-    }
+  /** Active bots for the bot engine to process */
+  async getActiveBots() {
+    return this.findAll({ status: 'active' }, { populate: 'user' });
+  }
 
-    /**
-     * Get user's bots
-     */
-    async findByUser(userId) {
-        return this.model.find({ user: userId }).sort({ createdAt: -1 });
-    }
+  async findByUser(userId) {
+    return this.findAll({ userId }, { sort: '-createdAt' });
+  }
 
-    /**
-     * Find bot by ID and ensure it belongs to user
-     */
-    async findByIdAndUser(id, userId) {
-        return this.model.findOne({ _id: id, user: userId });
-    }
+  async findByIdAndUser(id, userId) {
+    return this.findOne({ id, userId });
+  }
 }
 
 module.exports = new TradingBotRepository();

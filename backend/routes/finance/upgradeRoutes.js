@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../../middleware/pg/auth');
-const TierService = require('../../services/pg/TierService');
-const TierRepository = require('../../repositories/pg/TierRepository');
-const UserRepository = require('../../repositories/pg/UserRepository');
+const { protect } = require('../../middleware/auth');
+const TierService = require('../../services/TierService');
+const TierRepository = require('../../repositories/TierRepository');
+const UserRepository = require('../../repositories/UserRepository');
 const ApiError = require('../../utils/ApiError');
 
 router.use(protect);

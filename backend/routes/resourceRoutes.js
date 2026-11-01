@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const COTService = require('../services/trading/COTService');
-const FundamentalService = require('../services/pg/FundamentalService');
-const SeasonalityService = require('../services/trading/SeasonalityService');
-const ContractCalendarService = require('../services/trading/ContractCalendarService');
-const ContractHeatMapService = require('../services/trading/ContractHeatMapService');
-const ContractDataService = require('../services/trading/ContractDataService');
-const StrategyService = require('../services/trading/StrategyService');
-const { protect } = require('../middleware/pg/auth');
+const COTService = require('../services/COTService');
+const FundamentalService = require('../services/FundamentalService');
+const SeasonalityService = require('../services/SeasonalityService');
+const ContractCalendarService = require('../services/ContractCalendarService');
+const ContractHeatMapService = require('../services/ContractHeatMapService');
+const ContractDataService = require('../services/ContractDataService');
+const StrategyService = require('../services/StrategyService');
+const { protect } = require('../middleware/auth');
 const ApiResponse = require('../utils/ApiResponse');
 
 router.get('/cot/:asset', protect, async (req, res) => {
@@ -181,3 +181,6 @@ router.get('/strategies/:id', protect, async (req, res) => {
 });
 
 module.exports = router;
+
+
+

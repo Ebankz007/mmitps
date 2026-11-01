@@ -1,38 +1,30 @@
+/**
+ * KYCRepository — PostgreSQL edition.
+ */
 const BaseRepository = require('./BaseRepository');
-const KYCDocument = require('../models/KYC/KYCDocument');
+const { kycDocuments } = require('../../db/schema/kyc');
 
 class KYCRepository extends BaseRepository {
-    constructor() {
-        super(KYCDocument);
-    }
+  constructor() {
+    super(kycDocuments);
+  }
 
-    async findByUser(userId) {
-        return this.model.find({ user: userId }).sort({ createdAt: -1 });
-    }
+  async findByUser(userId, options = {}) {
+    return this.findAll({ userId }, { sort: 'createdAt', direction: 'desc', ...options });
+  }
 
-    async findPending() {
-        return this.model.find({ status: 'pending' })
-            .populate('user', 'username email name')
-            .sort({ createdAt: 1 });
-    }
+  async findPending(options = {}) {
+    return this.findAll({ status: 'pending' }, { sort: 'createdAt', direction: 'asc', ...options });
+  }
 
-    async countPending() {
-        return this.model.countDocuments({ status: 'pending' });
-    }
-
-    async updateStatus(documentId, status, verifiedBy, reason = null) {
-        const update = {
-            status,
-            verifiedBy,
-            verifiedAt: new Date()
-        };
-
-        if (reason) {
-            update.rejectionReason = reason;
-        }
-
-        return this.model.findByIdAndUpdate(documentId, update, { new: true });
-    }
+  async updateStatus(documentId, status, verifiedById, rejectionReason = null) {
+    return this.update(documentId, {
+      status,
+      verifiedById,
+      verifiedAt: new Date(),
+      rejectionReason,
+    });
+  }
 }
 
 module.exports = new KYCRepository();

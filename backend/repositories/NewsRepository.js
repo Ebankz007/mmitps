@@ -1,18 +1,25 @@
+// backend/repositories/pg/NewsRepository.js — news_articles (News)
 const BaseRepository = require('./BaseRepository');
-const NewsArticle = require('../models/News/NewsArticle');
+const { newsArticles } = require('../../db/schema/news');
+const { users } = require('../../db/schema/core');
+const { eq } = require('drizzle-orm');
 
 class NewsRepository extends BaseRepository {
-    constructor() {
-        super(NewsArticle);
-    }
+  constructor() {
+    super(newsArticles, {
+      relations: {
+        author: { table: users, on: eq(newsArticles.authorId, users.id) },
+      },
+    });
+  }
 
-    async findPublished(filters = {}) {
-        return this.model.find({ ...filters, isPublished: true }).sort('-publishedAt').limit(20);
-    }
+  async findBySlug(slug) {
+    return this.findOne({ slug }, { populate: 'author' });
+  }
 
-    async findBySlug(slug) {
-        return this.model.findOne({ slug, isPublished: true });
-    }
+  async findPublished(filters = {}, options = {}) {
+    return this.findAll({ ...filters, isPublished: true }, { sort: '-publishedAt', ...options });
+  }
 }
 
 module.exports = new NewsRepository();

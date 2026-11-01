@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { protect, authorize } = require('../middleware/pg/auth');
-const { checkFeature } = require('../middleware/pg/checkFeature');
+const { protect, authorize } = require('../middleware/auth');
+const { checkFeature } = require('../middleware/checkFeature');
 
 router.use(protect);
 
@@ -23,3 +23,4 @@ router.get('/vps-station', checkFeature('vpsHosting'), (req, res) => {
 });
 
 module.exports = router;
+

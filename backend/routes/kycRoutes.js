@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const kycController = require('../controllers/pg/kycController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const kycController = require('../controllers/kycController');
+const { protect, authorize } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const { uploadLimiter } = require('../middleware/rateLimit');
 
@@ -20,3 +20,4 @@ router.put('/admin/documents/:id', kycController.reviewDocument);
 router.post('/admin/aml-check', kycController.triggerAMLCheck);
 
 module.exports = router;
+

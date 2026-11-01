@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const sentimentController = require('../controllers/pg/SentimentController');
-const { protect } = require('../middleware/pg/auth');
+const sentimentController = require('../controllers/SentimentController');
+const { protect } = require('../middleware/auth');
 
 /**
  * @route   GET /api/v1/sentiment/overview/market
@@ -19,3 +19,4 @@ router.get('/overview/market', protect, sentimentController.getMarketOverview);
 router.get('/:symbol', protect, sentimentController.getSentiment);
 
 module.exports = router;
+

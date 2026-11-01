@@ -1,18 +1,15 @@
+// backend/repositories/pg/ActivityLogRepository.js — activity_logs (System)
 const BaseRepository = require('./BaseRepository');
-const ActivityLog = require('../models/System/ActivityLog');
+const { activityLogs } = require('../../db/schema/system');
 
 class ActivityLogRepository extends BaseRepository {
-    constructor() {
-        super(ActivityLog);
-    }
+  constructor() {
+    super(activityLogs);
+  }
 
-    async findByUser(userId, options = {}) {
-        return this.findAll({ user: userId }, options);
-    }
-
-    async findByCategory(category, options = {}) {
-        return this.findAll({ category }, options);
-    }
+  async findByUser(userId, options = {}) {
+    return this.findAll({ userId }, { sort: '-createdAt', ...options });
+  }
 }
 
 module.exports = new ActivityLogRepository();

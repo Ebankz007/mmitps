@@ -1,99 +1,37 @@
-const ContentBlock = require('../models/ContentBlock');
-
 /**
- * @desc    Get all content blocks (optional type filter)
- * @route   GET /api/cms?type=article
- * @access  Public (for fetching content)
+ * cmsController — PostgreSQL edition (content blocks).
+ * Mirrors the Mongo controllers/cmsController.
  */
-exports.getBlocks = async (req, res) => {
-    try {
-        const filter = {};
-        if (req.query.type) {
-            filter.type = req.query.type;
-        }
-        // If not admin, maybe only show active ones?
-        // For now, let's return all and let frontend decide or filter by active
-        if (!req.user || req.user.role !== 'admin') {
-            filter.isActive = true;
-        }
+const ContentBlockRepository = require('../repositories/ContentBlockRepository');
+const catchAsync = require('../utils/catchAsync');
+const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
-        const blocks = await ContentBlock.find(filter).sort('-createdAt');
-        res.status(200).json({ success: true, count: blocks.length, data: blocks });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.getBlocks = catchAsync(async (req, res) => {
+  const blocks = await ContentBlockRepository.findAll({}, { sort: 'createdAt' });
+  res.status(200).json(new ApiResponse(true, blocks, 'Blocks retrieved'));
+});
 
-/**
- * @desc    Get single content block by slug
- * @route   GET /api/cms/:slug
- * @access  Public
- */
-exports.getBlock = async (req, res) => {
-    try {
-        const block = await ContentBlock.findOne({ slug: req.params.slug });
-        if (!block) {
-            return res.status(404).json({ success: false, message: 'Content not found' });
-        }
-        res.status(200).json({ success: true, data: block });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+exports.getBlock = catchAsync(async (req, res) => {
+  const block = await ContentBlockRepository.findBySlug(req.params.slug);
+  if (!block) throw new ApiError(404, 'Block not found');
+  res.status(200).json(new ApiResponse(true, block, 'Block retrieved'));
+});
 
-/**
- * @desc    Create new content block
- * @route   POST /api/cms
- * @access  Private/Admin
- */
-exports.createBlock = async (req, res) => {
-    try {
-        req.body.author = req.user.id;
-        const block = await ContentBlock.create(req.body);
-        res.status(201).json({ success: true, data: block });
-    } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-};
+exports.createBlock = catchAsync(async (req, res) => {
+  const block = await ContentBlockRepository.create(req.body);
+  res.status(201).json(new ApiResponse(true, block, 'Block created'));
+});
 
-/**
- * @desc    Update content block
- * @route   PUT /api/cms/:id
- * @access  Private/Admin
- */
-exports.updateBlock = async (req, res) => {
-    try {
-        let block = await ContentBlock.findById(req.params.id);
-        if (!block) {
-            return res.status(404).json({ success: false, message: 'Content not found' });
-        }
+exports.updateBlock = catchAsync(async (req, res) => {
+  const block = await ContentBlockRepository.update(req.params.id, req.body);
+  if (!block) throw new ApiError(404, 'Block not found');
+  res.status(200).json(new ApiResponse(true, block, 'Block updated'));
+});
 
-        block = await ContentBlock.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true
-        });
+exports.deleteBlock = catchAsync(async (req, res) => {
+  const deleted = await ContentBlockRepository.delete(req.params.id);
+  if (!deleted) throw new ApiError(404, 'Block not found');
+  res.status(200).json(new ApiResponse(true, null, 'Block deleted'));
+});
 
-        res.status(200).json({ success: true, data: block });
-    } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
-    }
-};
-
-/**
- * @desc    Delete content block
- * @route   DELETE /api/cms/:id
- * @access  Private/Admin
- */
-exports.deleteBlock = async (req, res) => {
-    try {
-        const block = await ContentBlock.findById(req.params.id);
-        if (!block) {
-            return res.status(404).json({ success: false, message: 'Content not found' });
-        }
-
-        await block.deleteOne();
-        res.status(200).json({ success: true, data: {} });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};

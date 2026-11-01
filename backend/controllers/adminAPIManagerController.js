@@ -1,153 +1,136 @@
+/**
+ * AdminAPIManagerController — PostgreSQL edition.
+ * ApiServiceManager is already on the pg stack (system_configs-backed).
+ */
 const ApiServiceManager = require('../services/ApiServiceManager');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 
-/**
- * Get full API Manager configuration (Masked for security)
- */
+/** GET /admin/api-manager */
 exports.getConfig = catchAsync(async (req, res) => {
-    const config = await ApiServiceManager.getMaskedConfig();
-    res.status(200).json(new ApiResponse(true, config, 'API Manager configuration retrieved'));
+  const config = await ApiServiceManager.getMaskedConfig();
+  res.status(200).json(new ApiResponse(true, config, 'API Manager configuration retrieved'));
 });
 
-/**
- * Update API Manager configuration
- */
+/** PUT /admin/api-manager */
 exports.updateConfig = catchAsync(async (req, res) => {
-    const config = await ApiServiceManager.updateConfig(req.body, req.user.id);
-    res.status(200).json(new ApiResponse(true, config, 'API Manager configuration updated'));
+  const config = await ApiServiceManager.updateConfig(req.body, req.user.id);
+  res.status(200).json(new ApiResponse(true, config, 'API Manager configuration updated'));
 });
 
-/**
- * Toggle Mock Mode
- */
+/** POST /admin/api-manager/toggle-mock */
 exports.toggleMockMode = catchAsync(async (req, res) => {
-    const { enabled } = req.body;
-    const config = await ApiServiceManager.toggleMockMode(enabled, req.user.id);
-    res.status(200).json(new ApiResponse(true, config, `Mock Mode ${enabled ? 'enabled' : 'disabled'}`));
+  const { enabled } = req.body;
+  const config = await ApiServiceManager.toggleMockMode(enabled, req.user.id);
+  res.status(200).json(new ApiResponse(true, config, `Mock Mode ${enabled ? 'enabled' : 'disabled'}`));
 });
 
-/**
- * Update specific provider key
- */
+/** PATCH /admin/api-manager/provider-key */
 exports.updateProviderKey = catchAsync(async (req, res) => {
-    const { provider, key } = req.body;
-    const config = await ApiServiceManager.getConfig();
+  const { provider, key } = req.body;
+  const config = await ApiServiceManager.getConfig();
 
-    if (!config.providers[provider]) {
-        return res.status(404).json(new ApiResponse(false, null, `Provider ${provider} not found`));
-    }
+  if (!config.providers || !config.providers[provider]) {
+    return res.status(404).json(new ApiResponse(false, null, `Provider ${provider} not found`));
+  }
 
-    config.providers[provider].key = key;
-    await ApiServiceManager.updateConfig(config, req.user.id);
+  config.providers[provider].key = key;
+  await ApiServiceManager.updateConfig(config, req.user.id);
 
-    res.status(200).json(new ApiResponse(true, config, `Key for ${provider} updated`));
+  res.status(200).json(new ApiResponse(true, config, `Key for ${provider} updated`));
 });
-/**
- * Add a new service dynamically
- */
+
+/** POST /admin/api-manager/service */
 exports.addService = catchAsync(async (req, res) => {
-    const { category, name, data } = req.body;
+  const { category, name, data } = req.body;
 
-    if (!category || !name) {
-        return res.status(400).json(new ApiResponse(false, null, 'Category and name are required'));
-    }
+  if (!category || !name) {
+    return res.status(400).json(new ApiResponse(false, null, 'Category and name are required'));
+  }
 
-    const config = await ApiServiceManager.addService(category, name, data || {}, req.user.id);
-    const maskedConfig = await ApiServiceManager.getMaskedConfig();
-    res.status(201).json(new ApiResponse(true, maskedConfig, `Service ${name} added to ${category}`));
+  await ApiServiceManager.addService(category, name, data || {}, req.user.id);
+  const maskedConfig = await ApiServiceManager.getMaskedConfig();
+  res.status(201).json(new ApiResponse(true, maskedConfig, `Service ${name} added to ${category}`));
 });
 
-/**
- * Update a specific service
- */
+/** PUT /admin/api-manager/:category/:name */
 exports.updateSpecificService = catchAsync(async (req, res) => {
-    const { category, name } = req.params;
-    const data = req.body;
+  const { category, name } = req.params;
+  const data = req.body;
 
-    if (!category || !name) {
-        return res.status(400).json(new ApiResponse(false, null, 'Category and name are required'));
-    }
+  if (!category || !name) {
+    return res.status(400).json(new ApiResponse(false, null, 'Category and name are required'));
+  }
 
-    await ApiServiceManager.updateService(category, name, data, req.user.id);
+  await ApiServiceManager.updateService(category, name, data, req.user.id);
 
-    // Return masked config
-    const maskedConfig = await ApiServiceManager.getMaskedConfig();
-    res.status(200).json(new ApiResponse(true, maskedConfig, `Service ${name} updated successfully`));
+  const maskedConfig = await ApiServiceManager.getMaskedConfig();
+  res.status(200).json(new ApiResponse(true, maskedConfig, `Service ${name} updated successfully`));
 });
 
-/**
- * Delete a specific service
- */
+/** DELETE /admin/api-manager/:category/:name */
 exports.deleteService = catchAsync(async (req, res) => {
-    const { category, name } = req.params;
+  const { category, name } = req.params;
 
-    if (!category || !name) {
-        return res.status(400).json(new ApiResponse(false, null, 'Category and name are required'));
-    }
+  if (!category || !name) {
+    return res.status(400).json(new ApiResponse(false, null, 'Category and name are required'));
+  }
 
-    await ApiServiceManager.removeService(category, name, req.user.id);
+  await ApiServiceManager.removeService(category, name, req.user.id);
 
-    // Return masked config
-    const maskedConfig = await ApiServiceManager.getMaskedConfig();
-    res.status(200).json(new ApiResponse(true, maskedConfig, `Service ${name} removed from ${category}`));
+  const maskedConfig = await ApiServiceManager.getMaskedConfig();
+  res.status(200).json(new ApiResponse(true, maskedConfig, `Service ${name} removed from ${category}`));
 });
 
-/**
- * Test a specific service connection
- */
+/** POST /admin/api-manager/:category/:name/test */
 exports.testServiceConnection = catchAsync(async (req, res) => {
-    const { category, name } = req.params;
+  const { category, name } = req.params;
 
-    const config = await ApiServiceManager.getConfig();
-    if (!config[category] || !config[category][name]) {
-        return res.status(404).json(new ApiResponse(false, null, 'Service not found in configuration'));
-    }
+  const config = await ApiServiceManager.getConfig();
+  if (!config[category] || !config[category][name]) {
+    return res.status(404).json(new ApiResponse(false, null, 'Service not found in configuration'));
+  }
 
-    const serviceData = config[category][name];
+  const serviceData = config[category][name];
 
-    // Identify if keys exist to test
-    const hasKeys = !!(serviceData.key || serviceData.apiKey || serviceData.secretKey || serviceData.pass);
+  // Identify if keys exist to test
+  const hasKeys = !!(serviceData.key || serviceData.apiKey || serviceData.secretKey || serviceData.pass);
 
-    if (!hasKeys) {
-        return res.status(400).json(new ApiResponse(false, null, 'Service lacks authentication keys to perform a connection test.'));
-    }
+  if (!hasKeys) {
+    return res.status(400).json(new ApiResponse(false, null, 'Service lacks authentication keys to perform a connection test.'));
+  }
 
-    // Simulate verification delay
-    await new Promise(resolve => setTimeout(resolve, 800));
+  // Simulate verification delay
+  await new Promise(resolve => setTimeout(resolve, 800));
 
-    res.status(200).json(new ApiResponse(true, {
-        status: 'success',
-        latency: Math.floor(Math.random() * 100) + 40 + 'ms'
-    }, `Connection to ${name} verified successfully.`));
+  res.status(200).json(new ApiResponse(true, {
+    status: 'success',
+    latency: `${Math.floor(Math.random() * 100) + 40}ms`,
+  }, `Connection to ${name} verified successfully.`));
 });
 
-/**
- * Update a major configuration section
- */
+/** PUT /admin/api-manager/section/:section */
 exports.updateSection = catchAsync(async (req, res) => {
-    const { section } = req.params;
-    const data = req.body;
+  const { section } = req.params;
+  const data = req.body;
 
-    await ApiServiceManager.updateSection(section, data, req.user.id);
-    const maskedConfig = await ApiServiceManager.getMaskedConfig();
+  await ApiServiceManager.updateSection(section, data, req.user.id);
+  const maskedConfig = await ApiServiceManager.getMaskedConfig();
 
-    res.status(200).json(new ApiResponse(true, maskedConfig, `Section ${section} updated successfully`));
+  res.status(200).json(new ApiResponse(true, maskedConfig, `Section ${section} updated successfully`));
 });
 
-/**
- * Update a nested configuration property
- */
+/** PATCH /admin/api-manager/property */
 exports.updateNestedProperty = catchAsync(async (req, res) => {
-    const { path } = req.body;
-    const { data } = req.body;
+  const { path } = req.body;
+  const { data } = req.body;
 
-    if (!path) {
-        return res.status(400).json(new ApiResponse(false, null, 'Path is required (e.g. "payments.stripe")'));
-    }
+  if (!path) {
+    return res.status(400).json(new ApiResponse(false, null, 'Path is required (e.g. "payments.stripe")'));
+  }
 
-    await ApiServiceManager.updateNestedProperty(path, data, req.user.id);
-    const maskedConfig = await ApiServiceManager.getMaskedConfig();
+  await ApiServiceManager.updateNestedProperty(path, data, req.user.id);
+  const maskedConfig = await ApiServiceManager.getMaskedConfig();
 
-    res.status(200).json(new ApiResponse(true, maskedConfig, `Property ${path} updated successfully`));
+  res.status(200).json(new ApiResponse(true, maskedConfig, `Property ${path} updated successfully`));
 });

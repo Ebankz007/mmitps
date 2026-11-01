@@ -1,20 +1,17 @@
+/**
+ * AMLRepository — PostgreSQL edition.
+ */
 const BaseRepository = require('./BaseRepository');
-const AMLCheck = require('../models/KYC/AMLCheck');
+const { amlChecks } = require('../../db/schema/kyc');
 
 class AMLRepository extends BaseRepository {
-    constructor() {
-        super(AMLCheck);
-    }
+  constructor() {
+    super(amlChecks);
+  }
 
-    async findByUser(userId) {
-        return this.model.find({ user: userId }).sort({ createdAt: -1 });
-    }
-
-    async findPendingReviews() {
-        return this.model.find({ reviewRequired: true, status: { $ne: 'clear' }, action: { $exists: false } })
-            .populate('user', 'username email')
-            .sort({ createdAt: 1 });
-    }
+  async findByUser(userId, options = {}) {
+    return this.findAll({ userId }, { sort: 'createdAt', direction: 'desc', ...options });
+  }
 }
 
 module.exports = new AMLRepository();

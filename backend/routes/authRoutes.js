@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 // PostgreSQL edition — Phase 1 switchover. Mongo stack kept at controllers/authController.js
-const authController = require('../controllers/pg/authController');
-const { protect } = require('../middleware/pg/auth');
+const authController = require('../controllers/authController');
+const { protect } = require('../middleware/auth');
 const {
     registerRules,
     loginRules,

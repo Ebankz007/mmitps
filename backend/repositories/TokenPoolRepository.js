@@ -1,14 +1,21 @@
+/**
+ * TokenPoolRepository — PostgreSQL edition.
+ */
 const BaseRepository = require('./BaseRepository');
-const TokenPool = require('../models/Tokenization/TokenPool');
+const { tokenPools } = require('../../db/schema/tokenization');
 
 class TokenPoolRepository extends BaseRepository {
-    constructor() {
-        super(TokenPool);
-    }
+  constructor() {
+    super(tokenPools);
+  }
 
-    async findActive() {
-        return this.model.find({ status: 'open' }).sort('-createdAt');
-    }
+  async findActive(options = {}) {
+    return this.findAll({ status: 'open' }, { sort: 'createdAt', direction: 'desc', ...options });
+  }
+
+  async findByAssetType(assetType, options = {}) {
+    return this.findAll({ assetType, status: 'open' }, options);
+  }
 }
 
 module.exports = new TokenPoolRepository();

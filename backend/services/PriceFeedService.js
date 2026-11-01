@@ -1,6 +1,6 @@
 const ApiServiceManager = require('./ApiServiceManager');
-const RealTimeDataService = require('./trading/RealTimeDataService');
-const VolumeAnalyticsService = require('./trading/VolumeAnalyticsService');
+const RealTimeDataService = require('./RealTimeDataService');
+const VolumeAnalyticsService = require('./VolumeAnalyticsService');
 const logger = require('../utils/logger');
 
 /**
@@ -126,3 +126,5 @@ class PriceFeedService {
 }
 
 module.exports = new PriceFeedService();
+
+

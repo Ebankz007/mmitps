@@ -7,9 +7,9 @@
  */
 const express = require('express');
 const router = express.Router();
-const tradingController = require('../controllers/pg/tradingController');
+const tradingController = require('../controllers/tradingController');
 const miscController = require('../controllers/miscController');
-const { protect } = require('../middleware/pg/auth');
+const { protect } = require('../middleware/auth');
 
 router.use(protect);
 
@@ -23,3 +23,4 @@ router.post('/vps/purchase', miscController.purchaseVPS);
 router.get('/live-streams', miscController.getLiveStreams);
 
 module.exports = router;
+

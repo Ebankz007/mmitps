@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const TierRepository = require('../repositories/pg/TierRepository');
+const TierRepository = require('../repositories/TierRepository');
 
 /**
  * @route   GET /api/v1/tiers

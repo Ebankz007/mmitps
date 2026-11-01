@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const socialHandleController = require('../controllers/pg/socialHandleController');
-const { protect, restrictTo } = require('../middleware/pg/auth');
+const socialHandleController = require('../controllers/socialHandleController');
+const { protect, restrictTo } = require('../middleware/auth');
 
 // Public routes (or any authenticated user can view active handles)
 router.get('/', socialHandleController.getHandles);
@@ -18,3 +18,5 @@ router.patch('/:id', socialHandleController.updateHandle);
 router.delete('/:id', socialHandleController.deleteHandle);
 
 module.exports = router;
+
+

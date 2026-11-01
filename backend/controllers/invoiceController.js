@@ -1,14 +1,14 @@
-const mongoose = require('mongoose');
-const Invoice = require('../models/Invoice');
+/**
+ * InvoiceController — PostgreSQL edition.
+ */
+const InvoiceRepository = require('../repositories/InvoiceRepository');
 
 // @desc    Get all invoices for current user
 // @route   GET /api/v1/invoices
 // @access  Private
 exports.getMyInvoices = async (req, res) => {
     try {
-        const invoices = await Invoice.find({ user: req.user.id })
-            .sort({ createdAt: -1 })
-            .populate('subscription', 'plan status');
+        const invoices = await InvoiceRepository.findByUser(req.user.id, { sort: 'createdAt', direction: 'desc' });
 
         res.status(200).json({
             success: true,
@@ -26,14 +26,14 @@ exports.getMyInvoices = async (req, res) => {
 // @access  Private
 exports.getInvoiceById = async (req, res) => {
     try {
-        const invoice = await Invoice.findById(req.params.id).populate('user', 'name email');
+        const invoice = await InvoiceRepository.findById(req.params.id);
 
         if (!invoice) {
             return res.status(404).json({ success: false, message: 'Invoice not found' });
         }
 
         // Make sure user owns the invoice or is admin
-        if (invoice.user._id.toString() !== req.user.id && req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        if (invoice.userId !== req.user.id && req.user.role !== 'admin' && req.user.role !== 'super_admin') {
             return res.status(401).json({ success: false, message: 'Not authorized' });
         }
 
@@ -52,13 +52,13 @@ exports.getInvoiceById = async (req, res) => {
 // @access  Private/Admin
 exports.createInvoice = async (req, res) => {
     try {
-        const invoice = await Invoice.create({
-            user: req.body.user,
-            subscription: req.body.subscription,
+        const invoice = await InvoiceRepository.create({
+            userId: req.body.user,
+            subscriptionId: req.body.subscription,
             amount: req.body.amount,
             currency: req.body.currency || 'USD',
             status: req.body.status || 'open',
-            paidAt: req.body.status === 'paid' ? Date.now() : null
+            paidAt: req.body.status === 'paid' ? new Date() : null
         });
 
         res.status(201).json({
@@ -70,3 +70,4 @@ exports.createInvoice = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
+

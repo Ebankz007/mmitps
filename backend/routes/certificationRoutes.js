@@ -4,9 +4,9 @@ const {
     verifyCertificate,
     getMyCertificates,
     getAllCertificates
-} = require('../controllers/pg/certificationController');
+} = require('../controllers/certificationController');
 
-const { protect, authorize } = require('../middleware/pg/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -21,3 +21,5 @@ router.post('/issue', authorize('admin'), issueCertificate);
 router.get('/all', authorize('admin'), getAllCertificates);
 
 module.exports = router;
+
+

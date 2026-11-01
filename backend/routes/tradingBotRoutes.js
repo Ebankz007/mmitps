@@ -3,8 +3,8 @@
  */
 const express = require('express');
 const router = express.Router();
-const tradingBotController = require('../controllers/pg/tradingBotController');
-const { protect } = require('../middleware/pg/auth');
+const tradingBotController = require('../controllers/tradingBotController');
+const { protect } = require('../middleware/auth');
 
 router.get('/health', (req, res) => res.send('Bot Route OK'));
 
@@ -27,3 +27,4 @@ router.get('/', protect, tradingBotController.getMyBots);
 router.patch('/:id/status', protect, tradingBotController.updateStatus);
 
 module.exports = router;
+

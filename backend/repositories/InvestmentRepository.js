@@ -1,18 +1,25 @@
+/**
+ * InvestmentRepository — PostgreSQL edition (investments table, token-pool purchases).
+ */
 const BaseRepository = require('./BaseRepository');
-const Investment = require('../models/Tokenization/Investment');
+const { investments } = require('../../db/schema/tokenization');
 
 class InvestmentRepository extends BaseRepository {
-    constructor() {
-        super(Investment);
-    }
+  constructor() {
+    super(investments);
+  }
 
-    async findByUser(userId) {
-        return this.model.find({ user: userId }).populate('pool');
-    }
+  async findByUser(userId, options = {}) {
+    return this.findAll({ userId }, { sort: 'createdAt', direction: 'desc', ...options });
+  }
 
-    async findByPool(poolId) {
-        return this.model.find({ pool: poolId }).populate('user', 'firstName lastName email');
-    }
+  async findByPool(poolId, options = {}) {
+    return this.findAll({ poolId }, options);
+  }
+
+  async findActiveByPool(poolId) {
+    return this.findAll({ poolId, status: 'active' });
+  }
 }
 
 module.exports = new InvestmentRepository();

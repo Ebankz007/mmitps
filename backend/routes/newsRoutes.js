@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const newsController = require('../controllers/pg/newsController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const newsController = require('../controllers/newsController');
+const { protect, authorize } = require('../middleware/auth');
 
 // Public routes
 router.get('/', newsController.getLatestNews);
@@ -13,3 +13,5 @@ router.post('/', authorize('admin', 'instructor'), newsController.createArticle)
 router.patch('/:id/publish', authorize('admin', 'instructor'), newsController.publishArticle);
 
 module.exports = router;
+
+

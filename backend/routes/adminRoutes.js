@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const adminUserController = require('../controllers/pg/adminUserController');
-const adminPlansController = require('../controllers/pg/adminPlansController');
-const adminSubscriptionController = require('../controllers/pg/adminSubscriptionController');
-const adminServicesController = require('../controllers/pg/adminServicesController');
-const systemController = require('../controllers/pg/systemController');
-const adminFeatureController = require('../controllers/pg/adminFeatureController');
-const adminPaymentController = require('../controllers/pg/adminPaymentController');
-const adminAPIManagerController = require('../controllers/pg/adminAPIManagerController');
-const adminTradingController = require('../controllers/pg/adminTradingController');
-const walletController = require('../controllers/pg/walletController');
-const adminEducationController = require('../controllers/pg/adminEducationController');
-const adminEmailController = require('../controllers/pg/adminEmailController');
-const couponController = require('../controllers/pg/couponController');
+const adminUserController = require('../controllers/adminUserController');
+const adminPlansController = require('../controllers/adminPlansController');
+const adminSubscriptionController = require('../controllers/adminSubscriptionController');
+const adminServicesController = require('../controllers/adminServicesController');
+const systemController = require('../controllers/systemController');
+const adminFeatureController = require('../controllers/adminFeatureController');
+const adminPaymentController = require('../controllers/adminPaymentController');
+const adminAPIManagerController = require('../controllers/adminAPIManagerController');
+const adminTradingController = require('../controllers/adminTradingController');
+const walletController = require('../controllers/walletController');
+const adminEducationController = require('../controllers/adminEducationController');
+const adminEmailController = require('../controllers/adminEmailController');
+const couponController = require('../controllers/couponController');
 const { uploadLimiter } = require('../middleware/rateLimit');
-const { protect, authorize } = require('../middleware/pg/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
 router.use(authorize('admin', 'super_admin'));
@@ -144,3 +144,4 @@ router.put('/email/templates/:key',          adminEmailController.updateTemplate
 router.post('/email/templates/:key/reset',   adminEmailController.resetTemplate);
 
 module.exports = router;
+

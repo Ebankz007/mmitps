@@ -1,5 +1,8 @@
-const TokenPoolService = require('../services/tokenization/TokenPoolService');
-const InvestmentService = require('../services/tokenization/InvestmentService');
+/**
+ * TokenizationController — PostgreSQL edition.
+ */
+const TokenPoolService = require('../services/TokenPoolService');
+const InvestmentService = require('../services/InvestmentService');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 
@@ -22,12 +25,12 @@ exports.getPool = catchAsync(async (req, res) => {
 // Investments
 exports.invest = catchAsync(async (req, res) => {
     const { poolId, amount } = req.body;
-    const investment = await InvestmentService.invest(req.user._id, poolId, amount);
+    const investment = await InvestmentService.invest(req.user.id, poolId, amount);
     res.status(200).json(new ApiResponse(true, investment, 'Investment successful'));
 });
 
 exports.getMyInvestments = catchAsync(async (req, res) => {
-    const investments = await InvestmentService.getUserInvestments(req.user._id);
+    const investments = await InvestmentService.getUserInvestments(req.user.id);
     res.status(200).json(new ApiResponse(true, investments, 'User investments retrieved'));
 });
 
@@ -36,3 +39,4 @@ exports.getPoolsByCategory = catchAsync(async (req, res) => {
     const pools = await TokenPoolService.getPoolsByCategory(category);
     res.status(200).json(new ApiResponse(true, pools, `Active ${category} pools retrieved`));
 });
+

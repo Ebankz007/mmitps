@@ -1,6 +1,6 @@
 const express = require('express');
-const bonusController = require('../controllers/pg/bonusController');
-const { protect } = require('../middleware/pg/auth');
+const bonusController = require('../controllers/bonusController');
+const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -11,3 +11,4 @@ router.get('/my-claims', bonusController.getMyClaims);
 router.post('/:id/claim', bonusController.claimBonus);
 
 module.exports = router;
+

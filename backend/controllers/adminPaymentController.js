@@ -1,189 +1,162 @@
-const { PaymentGateway } = require('../models');
+/**
+ * AdminPaymentController — PostgreSQL edition.
+ * Payment gateway config (mirrors Mongo adminPaymentController).
+ */
+const PaymentGatewayRepository = require('../repositories/PaymentGatewayRepository');
+const catchAsync = require('../utils/catchAsync');
+const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
-// @desc    Get payment gateway configuration
-// @route   GET /api/v1/admin/payment-config
-// @access  Private/Admin
-exports.getPaymentConfig = async (req, res) => {
-    try {
-        const providers = await PaymentGateway.find();
+const SENSITIVE_KEYS = ['secretKey', 'webhookSecret', 'clientSecret'];
 
-        // Sanitize sensitive keys for display
-        const sanitized = {};
-        providers.forEach(p => {
-            const providerData = p.toObject();
-            if (providerData.config) {
-                if (providerData.config.secretKey) providerData.config.secretKey = '***hidden***';
-                if (providerData.config.webhookSecret) providerData.config.webhookSecret = '***hidden***';
-                if (providerData.config.clientSecret) providerData.config.clientSecret = '***hidden***';
-            }
-            providerData.enabled = providerData.isActive; // Map for frontend
-            sanitized[p.name] = providerData;
-        });
+/** GET /admin/payment-config */
+exports.getPaymentConfig = catchAsync(async (req, res) => {
+  const providers = await PaymentGatewayRepository.findAll({});
 
-        res.status(200).json({ success: true, data: sanitized });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+  const sanitized = {};
+  providers.forEach(p => {
+    const providerData = { ...p };
+    if (providerData.config) {
+      const config = { ...providerData.config };
+      SENSITIVE_KEYS.forEach(k => {
+        if (config[k]) config[k] = '***hidden***';
+      });
+      providerData.config = config;
     }
-};
+    providerData.enabled = providerData.isActive; // Map for frontend
+    sanitized[p.name] = providerData;
+  });
 
-// @desc    Update payment gateway configuration
-// @route   PUT /api/v1/admin/payment-config/:provider
-// @access  Private/Admin
-exports.updatePaymentConfig = async (req, res) => {
-    try {
-        const { provider } = req.params;
-        const updateData = req.body;
+  res.status(200).json({ success: true, data: sanitized });
+});
 
-        const p = await PaymentGateway.findOne({ name: provider });
-        if (!p) {
-            return res.status(404).json({ success: false, error: 'Payment provider not found' });
-        }
+/** PUT /admin/payment-config/:provider */
+exports.updatePaymentConfig = catchAsync(async (req, res) => {
+  const { provider } = req.params;
+  const updateData = req.body;
 
-        // Map flat body fields to config object if needed, or just update the whole thing
-        if (updateData.isActive !== undefined) p.isActive = updateData.isActive;
-        if (updateData.currency) p.config.currency = updateData.currency;
-        if (updateData.supportedMethods) p.supportedMethods = updateData.supportedMethods;
+  const p = await PaymentGatewayRepository.findByName(provider);
+  if (!p) {
+    return res.status(404).json({ success: false, error: 'Payment provider not found' });
+  }
 
-        // Update sensitive fields in config
-        const sensitiveFields = ['publicKey', 'secretKey', 'webhookSecret', 'clientId', 'clientSecret', 'mode'];
-        sensitiveFields.forEach(field => {
-            if (updateData[field] !== undefined) {
-                if (!p.config) p.config = {};
-                p.config[field] = updateData[field];
-            }
-        });
+  const config = { ...(p.config || {}) };
+  const data = {};
 
-        p.markModified('config');
-        await p.save();
+  if (updateData.isActive !== undefined) data.isActive = updateData.isActive;
+  if (updateData.currency) config.currency = updateData.currency;
+  if (updateData.supportedMethods) data.supportedMethods = updateData.supportedMethods;
 
-        res.status(200).json({
-            success: true,
-            message: 'Payment configuration updated',
-            data: { provider, isActive: p.isActive }
-        });
-    } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
+  // Update sensitive fields in config
+  const sensitiveFields = ['publicKey', 'secretKey', 'webhookSecret', 'clientId', 'clientSecret', 'mode'];
+  sensitiveFields.forEach(field => {
+    if (updateData[field] !== undefined) {
+      config[field] = updateData[field];
     }
-};
+  });
+  data.config = config;
 
-// @desc    Bulk update payment configuration
-// @route   PUT /api/v1/admin/payment
-// @access  Private/Admin
-exports.bulkUpdatePaymentConfig = async (req, res) => {
-    try {
-        const updates = req.body; // e.g., { stripe: { ... }, paypal: { ... } }
+  const updated = await PaymentGatewayRepository.update(p.id, data);
 
-        for (const [name, data] of Object.entries(updates)) {
-            const p = await PaymentGateway.findOne({ name });
-            if (p) {
-                if (data.enabled !== undefined) p.isActive = data.enabled;
-                if (data.isActive !== undefined) p.isActive = data.isActive;
+  res.status(200).json({
+    success: true,
+    message: 'Payment configuration updated',
+    data: { provider, isActive: updated.isActive },
+  });
+});
 
-                // Update config fields
-                const sensitiveFields = ['publicKey', 'secretKey', 'webhookSecret', 'clientId', 'clientSecret', 'mode', 'currency'];
-                sensitiveFields.forEach(field => {
-                    if (data[field] !== undefined) {
-                        if (!p.config) p.config = {};
-                        p.config[field] = data[field];
-                    }
-                });
+/** PUT /admin/payment — bulk update */
+exports.bulkUpdatePaymentConfig = catchAsync(async (req, res) => {
+  const updates = req.body; // e.g., { stripe: { ... }, paypal: { ... } }
 
-                p.markModified('config');
-                await p.save();
-            }
+  for (const [name, data] of Object.entries(updates)) {
+    const p = await PaymentGatewayRepository.findByName(name);
+    if (p) {
+      const config = { ...(p.config || {}) };
+      const update = {};
+
+      if (data.enabled !== undefined) update.isActive = data.enabled;
+      if (data.isActive !== undefined) update.isActive = data.isActive;
+
+      const sensitiveFields = ['publicKey', 'secretKey', 'webhookSecret', 'clientId', 'clientSecret', 'mode', 'currency'];
+      sensitiveFields.forEach(field => {
+        if (data[field] !== undefined) {
+          config[field] = data[field];
         }
+      });
+      update.config = config;
 
-        res.status(200).json({ success: true, message: 'Settings saved' });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+      await PaymentGatewayRepository.update(p.id, update);
     }
-};
+  }
 
-// @desc    Toggle payment provider
-// @route   PATCH /api/v1/admin/payment-config/:provider/toggle
-// @access  Private/Admin
-exports.togglePaymentProvider = async (req, res) => {
-    try {
-        const { provider } = req.params;
+  res.status(200).json({ success: true, message: 'Settings saved' });
+});
 
-        const p = await PaymentGateway.findOne({ name: provider });
-        if (!p) {
-            return res.status(404).json({ success: false, error: 'Payment provider not found' });
-        }
+/** PATCH /admin/payment-config/:provider/toggle */
+exports.togglePaymentProvider = catchAsync(async (req, res) => {
+  const { provider } = req.params;
 
-        p.isActive = !p.isActive;
-        await p.save();
+  const p = await PaymentGatewayRepository.findByName(provider);
+  if (!p) {
+    return res.status(404).json({ success: false, error: 'Payment provider not found' });
+  }
 
-        res.status(200).json({
-            success: true,
-            message: `${provider} ${p.isActive ? 'enabled' : 'disabled'}`,
-            data: { provider, isActive: p.isActive }
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-};
+  const updated = await PaymentGatewayRepository.update(p.id, { isActive: !p.isActive });
 
-// @desc    Test payment gateway connection
-// @route   POST /api/v1/admin/payment-config/:provider/test
-// @access  Private/Admin
-exports.testPaymentConnection = async (req, res) => {
-    try {
-        const { provider } = req.params;
+  res.status(200).json({
+    success: true,
+    message: `${provider} ${updated.isActive ? 'enabled' : 'disabled'}`,
+    data: { provider, isActive: updated.isActive },
+  });
+});
 
-        const p = await PaymentGateway.findOne({ name: provider });
-        if (!p) {
-            return res.status(404).json({ success: false, error: 'Payment provider not found' });
-        }
+/** POST /admin/payment-config/:provider/test */
+exports.testPaymentConnection = catchAsync(async (req, res) => {
+  const { provider } = req.params;
 
-        if (!p.isActive) {
-            return res.status(400).json({ success: false, error: 'Provider is not active' });
-        }
+  const p = await PaymentGatewayRepository.findByName(provider);
+  if (!p) {
+    return res.status(404).json({ success: false, error: 'Payment provider not found' });
+  }
 
-        // Mock connection test
-        res.status(200).json({
-            success: true,
-            message: `${provider} connection successful`,
-            data: {
-                provider,
-                timestamp: new Date(),
-                status: 'connected'
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-};
+  if (!p.isActive) {
+    return res.status(400).json({ success: false, error: 'Provider is not active' });
+  }
 
-// @desc    Add new payment provider
-// @route   POST /api/v1/admin/payment-config
-// @access  Private/Admin
-exports.addPaymentProvider = async (req, res) => {
-    try {
-        const { providerName, currency, displayName, supportedMethods } = req.body;
+  // Mock connection test
+  res.status(200).json({
+    success: true,
+    message: `${provider} connection successful`,
+    data: {
+      provider,
+      timestamp: new Date(),
+      status: 'connected',
+    },
+  });
+});
 
-        if (!providerName) {
-            return res.status(400).json({ success: false, error: 'Provider name required' });
-        }
+/** POST /admin/payment-config */
+exports.addPaymentProvider = catchAsync(async (req, res) => {
+  const { providerName, currency, displayName, supportedMethods } = req.body;
 
-        const existing = await PaymentGateway.findOne({ name: providerName.toLowerCase() });
-        if (existing) {
-            return res.status(400).json({ success: false, error: 'Provider already exists' });
-        }
+  if (!providerName) {
+    return res.status(400).json({ success: false, error: 'Provider name required' });
+  }
 
-        const p = await PaymentGateway.create({
-            name: providerName.toLowerCase(),
-            displayName: displayName || providerName,
-            isActive: false,
-            config: { currency: currency || 'USD' },
-            supportedMethods: supportedMethods || []
-        });
+  const existing = await PaymentGatewayRepository.findByName(providerName.toLowerCase());
+  if (existing) {
+    return res.status(400).json({ success: false, error: 'Provider already exists' });
+  }
 
-        res.status(201).json({
-            success: true,
-            data: p
-        });
-    } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
-    }
-};
+  const p = await PaymentGatewayRepository.create({
+    name: providerName.toLowerCase(),
+    displayName: displayName || providerName,
+    isActive: false,
+    config: { currency: currency || 'USD' },
+    supportedMethods: supportedMethods || [],
+  });
+
+  res.status(201).json({ success: true, data: p });
+});
+

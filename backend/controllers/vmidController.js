@@ -1,5 +1,5 @@
 const catchAsync = require("../utils/catchAsync");
-const CorrelationAnalyticsService = require("../services/trading/CorrelationAnalyticsService");
+const CorrelationAnalyticsService = require("../services/CorrelationAnalyticsService");
 const LiveStreamService = require("../services/LiveStreamService");
 const ApiError = require("../utils/ApiError");
 
@@ -240,3 +240,4 @@ exports.getCorrelationMatrix = catchAsync(async (req, res) => {
         }
     });
 });
+

@@ -1,18 +1,31 @@
 const BaseRepository = require('./BaseRepository');
-const SystemConfig = require('../models/System/SystemConfig');
+const { systemConfigs } = require('../../db/schema/system');
 
 class SystemConfigRepository extends BaseRepository {
-    constructor() {
-        super(SystemConfig);
-    }
+  constructor() {
+    super(systemConfigs);
+  }
 
-    async findByKey(key) {
-        return this.model.findOne({ key });
-    }
+  /** Find config by key. */
+  async findByKey(key) {
+    return this.findOne({ key });
+  }
 
-    async findByCategory(category) {
-        return this.model.find({ category });
+  /** Get config value (JSONB) or default. */
+  async getValue(key, fallback = null) {
+    const config = await this.findByKey(key);
+    return config?.value ?? fallback;
+  }
+
+  /** Upsert a config value (JSONB) with optional lastModifiedBy. */
+  async updateConfig(key, value, lastModifiedBy = null) {
+    const existing = await this.findByKey(key);
+    const data = { key, value, lastModifiedBy };
+    if (existing) {
+      return this.update(existing.id, data);
     }
+    return this.create(data);
+  }
 }
 
 module.exports = new SystemConfigRepository();

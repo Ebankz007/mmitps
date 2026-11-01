@@ -1,5 +1,11 @@
-const User = require('../models/User');
+/**
+ * UserEmailController — PostgreSQL edition.
+ * Email notification preferences live in users.preferences.notifications (jsonb).
+ */
+const UserRepository = require('../repositories/UserRepository');
 const ApiError = require('../utils/ApiError');
+
+const ALLOWED_CATEGORIES = ['auth', 'finance', 'kyc', 'subscription', 'trading', 'support', 'system', 'marketing'];
 
 /**
  * GET /api/v1/user/email-preferences
@@ -7,14 +13,15 @@ const ApiError = require('../utils/ApiError');
  */
 exports.getEmailPreferences = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user._id).select('preferences.notifications');
+        const user = await UserRepository.findById(req.user.id);
         if (!user) return next(ApiError.notFound('User not found'));
 
+        const notifications = user.preferences?.notifications || {};
         res.json({
             success: true,
             data: {
-                email:            user.preferences?.notifications?.email ?? true,
-                emailCategories:  user.preferences?.notifications?.emailCategories || {}
+                email:            notifications.email ?? true,
+                emailCategories:  notifications.emailCategories || {}
             }
         });
     } catch (err) {
@@ -29,33 +36,38 @@ exports.getEmailPreferences = async (req, res, next) => {
 exports.updateEmailPreferences = async (req, res, next) => {
     try {
         const { email, emailCategories } = req.body;
-        const updateFields = {};
+        const user = await UserRepository.findById(req.user.id);
+        if (!user) return next(ApiError.notFound('User not found'));
+
+        const notifications = {
+            ...(user.preferences?.notifications || {}),
+        };
 
         if (typeof email === 'boolean') {
-            updateFields['preferences.notifications.email'] = email;
+            notifications.email = email;
         }
 
         if (emailCategories && typeof emailCategories === 'object') {
-            const allowed = ['auth', 'finance', 'kyc', 'subscription', 'trading', 'support', 'system', 'marketing'];
+            const currentCategories = { ...(notifications.emailCategories || {}) };
             for (const [category, value] of Object.entries(emailCategories)) {
-                if (allowed.includes(category)) {
-                    updateFields[`preferences.notifications.emailCategories.${category}`] = Boolean(value);
+                if (ALLOWED_CATEGORIES.includes(category)) {
+                    currentCategories[category] = Boolean(value);
                 }
             }
+            notifications.emailCategories = currentCategories;
         }
 
-        const user = await User.findByIdAndUpdate(
-            req.user._id,
-            { $set: updateFields },
-            { new: true, select: 'preferences.notifications' }
-        );
+        const updated = await UserRepository.update(req.user.id, {
+            preferences: { ...(user.preferences || {}), notifications },
+        });
 
         res.json({
             success: true,
             message: 'Email preferences updated',
-            data: user.preferences?.notifications || {}
+            data: updated.preferences?.notifications || {}
         });
     } catch (err) {
         next(err);
     }
 };
+

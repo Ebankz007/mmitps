@@ -1,18 +1,20 @@
 const BaseRepository = require('./BaseRepository');
-const Plan = require('../models/Plan');
+const { plans } = require('../../db/schema/core');
 
 class PlanRepository extends BaseRepository {
-    constructor() {
-        super(Plan);
-    }
+  constructor() {
+    super(plans);
+  }
 
-    async findByCode(code) {
-        return this.model.findOne({ code }).lean();
-    }
+  /** Find plan by code. */
+  async findByCode(code) {
+    return this.findOne({ code });
+  }
 
-    async findActive() {
-        return this.model.find({ isActive: true }).lean();
-    }
+  /** Find all active plans. */
+  async findActive() {
+    return this.findAll({ isActive: true });
+  }
 }
 
 module.exports = new PlanRepository();

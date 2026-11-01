@@ -1,6 +1,6 @@
 const express = require("express");
 const alertController = require("../controllers/alertController");
-const { protect } = require("../middleware/pg/auth");
+const { protect } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -22,3 +22,4 @@ router
     .delete(alertController.deleteAlert);
 
 module.exports = router;
+

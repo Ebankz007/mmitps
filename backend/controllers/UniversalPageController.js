@@ -1,4 +1,4 @@
-const UniversalPageService = require('../services/cms/UniversalPageService');
+const UniversalPageService = require('../services/UniversalPageService');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 
@@ -18,3 +18,4 @@ exports.getBatchContext = catchAsync(async (req, res) => {
     }
     res.status(200).json(new ApiResponse(true, results, 'Batch context retrieved'));
 });
+

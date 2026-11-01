@@ -9,9 +9,9 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const UserRepository = require('./repositories/pg/UserRepository');
-const WalletRepository = require('./repositories/pg/WalletRepository');
-const TransactionRepository = require('./repositories/pg/TransactionRepository');
+const UserRepository = require('./repositories/UserRepository');
+const WalletRepository = require('./repositories/WalletRepository');
+const TransactionRepository = require('./repositories/TransactionRepository');
 const { pool } = require('../db');
 
 const SEED_USERNAMES = ['admin', 'superadmin'];

@@ -210,7 +210,7 @@ app.use('/api/v1/webhooks', webhookRoutes);
 // Public plans endpoint (no auth required - for landing page pricing)
 app.get('/api/v1/plans', async (req, res) => {
     try {
-        const PlanRepository = require('./repositories/pg/PlanRepository');
+        const PlanRepository = require('./repositories/PlanRepository');
         const plans = await PlanRepository.findAll({ isActive: true }, { sort: 'price' });
         res.status(200).json({ success: true, data: plans });
     } catch (err) {
@@ -226,7 +226,7 @@ console.log('✅ Milestone 25: Financial & Social Routes Mounted');
 console.log('✅ Milestone 30: AI Advisor, Sentiment & Bot Routes Mounted');
 
 // Bot Execution Scheduler — PG edition
-const TradingBotService = require('./services/pg/TradingBotService');
+const TradingBotService = require('./services/TradingBotService');
 // Note: PG TradingBotService does not yet implement runBotCycles (demo-only bot runner).
 // Re-enable when the PG bot cycle is ported. For now, the scheduler is disabled.
 // setInterval(() => {
@@ -236,7 +236,7 @@ const TradingBotService = require('./services/pg/TradingBotService');
 // Notification TTL sweeper (PG) — purge expired notifications hourly
 // (pg_cron is unavailable on Windows; node-cron is the portable equivalent.)
 const cron = require('node-cron');
-const NotificationRepository = require('./repositories/pg/NotificationRepository');
+const NotificationRepository = require('./repositories/NotificationRepository');
 cron.schedule('0 * * * *', async () => {
     try {
         const purged = await NotificationRepository.deleteExpired();
@@ -313,7 +313,7 @@ setInterval(() => {
 }, 60000); // Check every 60 seconds
 
 // Settlement Overdue Watchdog (Check every hour) — PG edition
-const SettlementService = require('./services/pg/SettlementService');
+const SettlementService = require('./services/SettlementService');
 setInterval(() => {
     SettlementService.checkOverdueSettlements().catch(err => logger.error(`[SETTLEMENT WATCHDOG ERROR] ${err.message}`));
 }, 3600000); // 1 hour
@@ -347,3 +347,4 @@ process.on('unhandledRejection', (err) => {
 });
 
 module.exports = app;
+

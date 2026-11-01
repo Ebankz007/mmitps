@@ -8,8 +8,8 @@ const {
     deleteContent,
     upsertBySlug,
     bulkUpsert
-} = require('../controllers/pg/siteContentController');
-const { protect, authorize } = require('../middleware/pg/auth');
+} = require('../controllers/siteContentController');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -38,3 +38,5 @@ router.put('/:id', protect, authorize('admin'), updateContent);
 router.delete('/:id', protect, authorize('admin'), deleteContent);
 
 module.exports = router;
+
+

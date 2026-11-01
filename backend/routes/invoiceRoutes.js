@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { protect, authorize } = require('../middleware/pg/auth');
+const { protect, authorize } = require('../middleware/auth');
 const {
     getMyInvoices,
     getInvoiceById,
     createInvoice
-} = require('../controllers/pg/invoiceController');
+} = require('../controllers/invoiceController');
 
 router.use(protect);
 
@@ -15,3 +15,4 @@ router.post('/', authorize('admin', 'super_admin'), createInvoice);
 router.get('/:id', getInvoiceById);
 
 module.exports = router;
+

@@ -1,4 +1,4 @@
-const EmailTemplateRepository = require('../repositories/pg/EmailTemplateRepository');
+const EmailTemplateRepository = require('../repositories/EmailTemplateRepository');
 const logger = require('../utils/logger');
 
 // Category mapping: template key prefix → user category name
@@ -102,3 +102,4 @@ class EmailTemplateService {
 }
 
 module.exports = new EmailTemplateService();
+

@@ -1,4 +1,4 @@
-const SystemConfigRepository = require('../repositories/pg/SystemConfigRepository');
+const SystemConfigRepository = require('../repositories/SystemConfigRepository');
 const logger = require('../utils/logger');
 
 class ApiServiceManager {
@@ -343,3 +343,4 @@ class ApiServiceManager {
 }
 
 module.exports = new ApiServiceManager();
+

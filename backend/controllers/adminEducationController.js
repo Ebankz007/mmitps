@@ -1,246 +1,259 @@
-const mongoose = require('mongoose');
+/**
+ * AdminEducationController — PostgreSQL edition.
+ * Admin course/module/lesson CRUD (mirrors Mongo adminEducationController).
+ */
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const CourseRepository = require('../repositories/CourseRepository');
+const CourseModuleRepository = require('../repositories/CourseModuleRepository');
+const CourseLessonRepository = require('../repositories/CourseLessonRepository');
+const CourseProgressRepository = require('../repositories/CourseProgressRepository');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
-const Course = require('../models/Education/Course');
-const CourseProgress = require('../models/Education/CourseProgress');
 
-// ─── Multer Upload Config ──────────────────────────────────────────────────
-const uploadDir = path.join(__dirname, '..', 'uploads', 'education');
+// Multer Upload Config
+const uploadDir = path.join(__dirname, '..', '..', 'uploads', 'education');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadDir),
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        const name = `edu_${Date.now()}_${Math.round(Math.random() * 1e6)}${ext}`;
-        cb(null, name);
-    }
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const name = `edu_${Date.now()}_${Math.round(Math.random() * 1e6)}${ext}`;
+    cb(null, name);
+  },
 });
 
 const fileFilter = (req, file, cb) => {
-    const allowed = ['video/mp4', 'video/webm', 'video/ogg', 'application/pdf'];
-    if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new ApiError(400, 'Only video (mp4/webm/ogg) and PDF files are allowed'));
+  // Validate BOTH the mimetype and the real extension — the mimetype alone is
+  // client-supplied and spoofable, and /uploads is served statically.
+  const allowedMime = ['video/mp4', 'video/webm', 'video/ogg', 'application/pdf'];
+  const allowedExt = ['.mp4', '.webm', '.ogg', '.pdf'];
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (allowedMime.includes(file.mimetype) && allowedExt.includes(ext)) cb(null, true);
+  else cb(new ApiError(400, 'Only video (mp4/webm/ogg) and PDF files are allowed'));
 };
 
-exports.upload = multer({ storage, fileFilter, limits: { fileSize: 500 * 1024 * 1024 } }); // 500MB
+exports.upload = multer({ storage, fileFilter, limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB
 
-// ─── Course CRUD ──────────────────────────────────────────────────────────
+/** GET /admin/education/courses */
 exports.getAllCourses = catchAsync(async (req, res) => {
-    const { category, level, published, search } = req.query;
-    const filter = {};
-    if (category) filter.category = category;
-    if (level) filter.level = level;
-    if (published !== undefined) filter.isPublished = published === 'true';
-    if (search) filter.title = { $regex: search, $options: 'i' };
+  const { category, level, published, search } = req.query;
 
-    const courses = await Course.find(filter)
-        .populate('instructor', 'firstName lastName email')
-        .populate('allowedPlans', 'name type')
-        .sort({ createdAt: -1 })
-        .lean();
+  const filters = {};
+  if (category) filters.category = category;
+  if (level) filters.level = level;
+  if (published !== undefined) filters.isPublished = published === 'true';
+  if (search) filters.title = { $regex: search };
 
-    // Enrich with enrollment count
-    const enriched = await Promise.all(courses.map(async (course) => {
-        const enrolledCount = await CourseProgress.countDocuments({ course: course._id });
-        const completedCount = await CourseProgress.countDocuments({ course: course._id, isCompleted: true });
-        const totalLessons = course.modules?.reduce((sum, m) => sum + (m.lessons?.length || 0), 0) || 0;
-        return { ...course, enrolledCount, completedCount, totalLessons };
-    }));
+  const courses = await CourseRepository.getAllWithContent(filters, { sort: 'createdAt', direction: 'desc' });
 
-    res.status(200).json(new ApiResponse(true, enriched, 'Courses retrieved'));
+  // Enrich with enrollment + completion counts
+  const enriched = await Promise.all(courses.map(async (course) => {
+    const enrolledCount = await CourseProgressRepository.count({ courseId: course.id });
+    const completedCount = await CourseProgressRepository.count({ courseId: course.id, isCompleted: true });
+    const totalLessons = course.modules?.reduce((sum, m) => sum + (m.lessons?.length || 0), 0) || 0;
+    return { ...course, enrolledCount, completedCount, totalLessons };
+  }));
+
+  res.status(200).json(new ApiResponse(true, enriched, 'Courses retrieved'));
 });
 
+/** GET /admin/education/courses/:id */
 exports.getCourseById = catchAsync(async (req, res) => {
-    const course = await Course.findById(req.params.id)
-        .populate('instructor', 'firstName lastName email')
-        .populate('allowedPlans', 'name type price');
-    if (!course) throw new ApiError(404, 'Course not found');
-    res.status(200).json(new ApiResponse(true, course, 'Course retrieved'));
+  const course = await CourseRepository.getWithContent(req.params.id);
+  if (!course) {
+    throw ApiError.notFound('Course not found');
+  }
+  res.status(200).json(new ApiResponse(true, course, 'Course retrieved'));
 });
 
+/** POST /admin/education/courses */
 exports.createCourse = catchAsync(async (req, res) => {
-    const { title, description, thumbnail, category, level, tags, allowedPlans, price, currency } = req.body;
+  const { title, description, level, category, price, thumbnail, tags } = req.body;
 
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    const existing = await Course.findOne({ slug });
-    const finalSlug = existing ? `${slug}-${Date.now()}` : slug;
+  if (!title || !description) {
+    throw ApiError.badRequest('Title and description are required');
+  }
 
-    const course = await Course.create({
-        title, description, thumbnail, category, level, tags, allowedPlans, price, currency,
-        slug: finalSlug,
-        instructor: req.user._id,
-        isPublished: false,
-        modules: []
-    });
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
 
-    res.status(201).json(new ApiResponse(true, course, 'Course created'));
+  const course = await CourseRepository.create({
+    title,
+    slug,
+    description,
+    level: level || 'beginner',
+    category: category || 'trading',
+    price: price || 0,
+    thumbnail,
+    tags: tags || [],
+    instructorId: req.user.id,
+    isPublished: false,
+  });
+
+  res.status(201).json(new ApiResponse(true, course, 'Course created'));
 });
 
+/** PUT /admin/education/courses/:id */
 exports.updateCourse = catchAsync(async (req, res) => {
-    const { title, description, thumbnail, category, level, tags, allowedPlans, price, currency } = req.body;
-    const update = { title, description, thumbnail, category, level, tags, allowedPlans, price, currency };
+  const course = await CourseRepository.findById(req.params.id);
+  if (!course) {
+    throw ApiError.notFound('Course not found');
+  }
 
-    // Auto-regenerate slug if title changes
-    if (title) {
-        update.slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-    }
-
-    const course = await Course.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true })
-        .populate('allowedPlans', 'name type');
-    if (!course) throw new ApiError(404, 'Course not found');
-    res.status(200).json(new ApiResponse(true, course, 'Course updated'));
+  const updated = await CourseRepository.update(course.id, req.body);
+  res.status(200).json(new ApiResponse(true, updated, 'Course updated'));
 });
 
+/** DELETE /admin/education/courses/:id */
 exports.deleteCourse = catchAsync(async (req, res) => {
-    const course = await Course.findByIdAndDelete(req.params.id);
-    if (!course) throw new ApiError(404, 'Course not found');
-    await CourseProgress.deleteMany({ course: req.params.id });
-    res.status(200).json(new ApiResponse(true, null, 'Course and all student progress deleted'));
+  const course = await CourseRepository.findById(req.params.id);
+  if (!course) {
+    throw ApiError.notFound('Course not found');
+  }
+
+  await CourseRepository.delete(course.id);
+  res.status(200).json(new ApiResponse(true, null, 'Course deleted'));
 });
 
+/** PATCH /admin/education/courses/:id/toggle */
 exports.togglePublish = catchAsync(async (req, res) => {
-    const course = await Course.findById(req.params.id);
-    if (!course) throw new ApiError(404, 'Course not found');
-    course.isPublished = !course.isPublished;
-    await course.save();
-    res.status(200).json(new ApiResponse(true, { isPublished: course.isPublished }, `Course ${course.isPublished ? 'published' : 'unpublished'}`));
+  const course = await CourseRepository.findById(req.params.id);
+  if (!course) {
+    throw ApiError.notFound('Course not found');
+  }
+
+  const updated = await CourseRepository.update(course.id, { isPublished: !course.isPublished });
+  res.status(200).json(new ApiResponse(true, updated, `Course ${updated.isPublished ? 'published' : 'unpublished'}`));
 });
 
+/** GET /admin/education/courses/:id/stats */
 exports.getCourseStats = catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const course = await Course.findById(id).lean();
-    if (!course) throw new ApiError(404, 'Course not found');
+  const course = await CourseRepository.findById(req.params.id);
+  if (!course) {
+    throw ApiError.notFound('Course not found');
+  }
 
-    const totalEnrolled = await CourseProgress.countDocuments({ course: id });
-    const totalCompleted = await CourseProgress.countDocuments({ course: id, isCompleted: true });
-    const avgProgress = await CourseProgress.aggregate([
-        { $match: { course: new mongoose.Types.ObjectId(id) } },
-        { $group: { _id: null, avg: { $avg: '$progressPercent' } } }
-    ]);
+  const enrolledCount = await CourseProgressRepository.count({ courseId: course.id });
+  const completedCount = await CourseProgressRepository.count({ courseId: course.id, isCompleted: true });
+  const totalLessons = await CourseRepository.countLessons(course.id);
 
-    res.status(200).json(new ApiResponse(true, {
-        totalEnrolled,
-        totalCompleted,
-        completionRate: totalEnrolled > 0 ? Math.round((totalCompleted / totalEnrolled) * 100) : 0,
-        avgProgress: avgProgress[0]?.avg?.toFixed(1) || 0,
-        totalModules: course.modules?.length || 0,
-        totalLessons: course.modules?.reduce((s, m) => s + (m.lessons?.length || 0), 0) || 0
-    }, 'Course stats retrieved'));
+  res.status(200).json(new ApiResponse(true, {
+    enrolledCount,
+    completedCount,
+    completionRate: enrolledCount > 0 ? Math.round((completedCount / enrolledCount) * 100) : 0,
+    totalLessons,
+    totalModules: (await CourseModuleRepository.findByCourse(course.id)).length,
+  }, 'Course stats retrieved'));
 });
 
-// ─── Module CRUD ──────────────────────────────────────────────────────────
+// ── Modules ────────────────────────────────────────────────────────────────
+
+/** POST /admin/education/courses/:id/modules */
 exports.addModule = catchAsync(async (req, res) => {
-    const { title, description, order } = req.body;
-    const course = await Course.findById(req.params.id);
-    if (!course) throw new ApiError(404, 'Course not found');
+  const course = await CourseRepository.findById(req.params.id);
+  if (!course) {
+    throw ApiError.notFound('Course not found');
+  }
 
-    course.modules.push({ title, description, order: order ?? course.modules.length, lessons: [] });
-    await course.save();
-    res.status(201).json(new ApiResponse(true, course, 'Module added'));
+  const { title, description } = req.body;
+  if (!title) {
+    throw ApiError.badRequest('Module title is required');
+  }
+
+  const modules = await CourseModuleRepository.findByCourse(course.id);
+  const module = await CourseModuleRepository.create({
+    courseId: course.id,
+    title,
+    description,
+    order: modules.length,
+  });
+
+  res.status(201).json(new ApiResponse(true, module, 'Module added'));
 });
 
+/** PUT /admin/education/courses/:id/modules/:moduleId */
 exports.updateModule = catchAsync(async (req, res) => {
-    const { id, moduleId } = req.params;
-    const course = await Course.findById(id);
-    if (!course) throw new ApiError(404, 'Course not found');
+  const module = await CourseModuleRepository.findById(req.params.moduleId);
+  if (!module) {
+    throw ApiError.notFound('Module not found');
+  }
 
-    const mod = course.modules.id(moduleId);
-    if (!mod) throw new ApiError(404, 'Module not found');
-
-    const { title, description, order } = req.body;
-    if (title !== undefined) mod.title = title;
-    if (description !== undefined) mod.description = description;
-    if (order !== undefined) mod.order = order;
-
-    await course.save();
-    res.status(200).json(new ApiResponse(true, course, 'Module updated'));
+  const updated = await CourseModuleRepository.update(module.id, req.body);
+  res.status(200).json(new ApiResponse(true, updated, 'Module updated'));
 });
 
+/** DELETE /admin/education/courses/:id/modules/:moduleId */
 exports.deleteModule = catchAsync(async (req, res) => {
-    const { id, moduleId } = req.params;
-    const course = await Course.findById(id);
-    if (!course) throw new ApiError(404, 'Course not found');
+  const module = await CourseModuleRepository.findById(req.params.moduleId);
+  if (!module) {
+    throw ApiError.notFound('Module not found');
+  }
 
-    course.modules = course.modules.filter(m => m._id.toString() !== moduleId);
-    await course.save();
-    res.status(200).json(new ApiResponse(true, course, 'Module deleted'));
+  await CourseModuleRepository.delete(module.id);
+  res.status(200).json(new ApiResponse(true, null, 'Module deleted'));
 });
 
-// ─── Lesson CRUD ──────────────────────────────────────────────────────────
+// ── Lessons ────────────────────────────────────────────────────────────────
+
+/** POST /admin/education/courses/:id/modules/:moduleId/lessons */
 exports.addLesson = catchAsync(async (req, res) => {
-    const { id, moduleId } = req.params;
-    const { title, content, videoUrl, pdfUrl, duration, isFree, order } = req.body;
+  const module = await CourseModuleRepository.findById(req.params.moduleId);
+  if (!module) {
+    throw ApiError.notFound('Module not found');
+  }
 
-    const course = await Course.findById(id);
-    if (!course) throw new ApiError(404, 'Course not found');
+  const { title, content, videoUrl, pdfUrl, duration, isFree } = req.body;
+  if (!title) {
+    throw ApiError.badRequest('Lesson title is required');
+  }
 
-    const mod = course.modules.id(moduleId);
-    if (!mod) throw new ApiError(404, 'Module not found');
+  const lessons = await CourseLessonRepository.findByModule(module.id);
+  const lesson = await CourseLessonRepository.create({
+    moduleId: module.id,
+    title,
+    content,
+    videoUrl,
+    pdfUrl,
+    duration: duration || 0,
+    isFree: isFree || false,
+    order: lessons.length,
+  });
 
-    mod.lessons.push({
-        title, content, videoUrl, pdfUrl, duration,
-        isFree: isFree ?? false,
-        order: order ?? mod.lessons.length
-    });
-
-    // Recalculate total duration
-    course.totalDuration = course.modules.reduce((sum, m) =>
-        sum + m.lessons.reduce((ls, l) => ls + (l.duration || 0), 0), 0);
-
-    await course.save();
-    res.status(201).json(new ApiResponse(true, course, 'Lesson added'));
+  res.status(201).json(new ApiResponse(true, lesson, 'Lesson added'));
 });
 
+/** PUT /admin/education/courses/:id/modules/:moduleId/lessons/:lessonId */
 exports.updateLesson = catchAsync(async (req, res) => {
-    const { id, moduleId, lessonId } = req.params;
-    const course = await Course.findById(id);
-    if (!course) throw new ApiError(404, 'Course not found');
+  const lesson = await CourseLessonRepository.findById(req.params.lessonId);
+  if (!lesson) {
+    throw ApiError.notFound('Lesson not found');
+  }
 
-    const mod = course.modules.id(moduleId);
-    if (!mod) throw new ApiError(404, 'Module not found');
-
-    const lesson = mod.lessons.id(lessonId);
-    if (!lesson) throw new ApiError(404, 'Lesson not found');
-
-    const fields = ['title', 'content', 'videoUrl', 'pdfUrl', 'duration', 'isFree', 'order'];
-    fields.forEach(f => { if (req.body[f] !== undefined) lesson[f] = req.body[f]; });
-
-    course.totalDuration = course.modules.reduce((sum, m) =>
-        sum + m.lessons.reduce((ls, l) => ls + (l.duration || 0), 0), 0);
-
-    await course.save();
-    res.status(200).json(new ApiResponse(true, course, 'Lesson updated'));
+  const updated = await CourseLessonRepository.update(lesson.id, req.body);
+  res.status(200).json(new ApiResponse(true, updated, 'Lesson updated'));
 });
 
+/** DELETE /admin/education/courses/:id/modules/:moduleId/lessons/:lessonId */
 exports.deleteLesson = catchAsync(async (req, res) => {
-    const { id, moduleId, lessonId } = req.params;
-    const course = await Course.findById(id);
-    if (!course) throw new ApiError(404, 'Course not found');
+  const lesson = await CourseLessonRepository.findById(req.params.lessonId);
+  if (!lesson) {
+    throw ApiError.notFound('Lesson not found');
+  }
 
-    const mod = course.modules.id(moduleId);
-    if (!mod) throw new ApiError(404, 'Module not found');
-
-    mod.lessons = mod.lessons.filter(l => l._id.toString() !== lessonId);
-    await course.save();
-    res.status(200).json(new ApiResponse(true, course, 'Lesson deleted'));
+  await CourseLessonRepository.delete(lesson.id);
+  res.status(200).json(new ApiResponse(true, null, 'Lesson deleted'));
 });
 
-// ─── File Upload ──────────────────────────────────────────────────────────
+/** POST /admin/education/upload */
 exports.uploadLessonFile = catchAsync(async (req, res) => {
-    if (!req.file) throw new ApiError(400, 'No file uploaded');
+  if (!req.file) {
+    throw ApiError.badRequest('No file uploaded');
+  }
 
-    const baseUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5066}`;
-    const publicUrl = `${baseUrl}/uploads/education/${req.file.filename}`;
-
-    res.status(200).json(new ApiResponse(true, {
-        url: publicUrl,
-        filename: req.file.originalname,
-        mimetype: req.file.mimetype,
-        size: req.file.size
-    }, 'File uploaded successfully'));
+  const fileUrl = `/uploads/education/${req.file.filename}`;
+  res.status(201).json(new ApiResponse(true, { url: fileUrl, filename: req.file.filename }, 'File uploaded'));
 });
+

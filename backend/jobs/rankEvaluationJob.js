@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const RankService = require('../services/pg/RankService');
+const RankService = require('../services/RankService');
 const logger = require('../utils/logger');
 
 // Run daily at 2:00 AM
@@ -20,3 +20,4 @@ const job = cron.schedule('0 2 * * *', async () => {
 });
 
 module.exports = job;
+

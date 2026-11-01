@@ -1,5 +1,5 @@
-const AdminService = require('../services/admin/AdminService');
-const AuditService = require('../services/admin/AuditService');
+const AdminService = require('../services/AdminService');
+const AuditService = require('../services/AuditService');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 
@@ -42,3 +42,4 @@ exports.updateUserRole = catchAsync(async (req, res) => {
 
     res.status(200).json(new ApiResponse(true, user, 'User role updated successfully'));
 });
+

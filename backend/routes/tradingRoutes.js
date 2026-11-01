@@ -6,9 +6,9 @@
  */
 const express = require('express');
 const router = express.Router();
-const tradingController = require('../controllers/pg/tradingController');
-const tradingAccountController = require('../controllers/pg/tradingAccountController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const tradingController = require('../controllers/tradingController');
+const tradingAccountController = require('../controllers/tradingAccountController');
+const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
 
@@ -31,3 +31,4 @@ router.post('/accounts/:id/sync', tradingAccountController.syncAccountStats);
 router.delete('/accounts/:id', tradingAccountController.disconnectAccount);
 
 module.exports = router;
+

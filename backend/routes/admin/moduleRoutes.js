@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { protect, authorize } = require('../../middleware/pg/auth');
-const ModuleRepository = require('../../repositories/pg/ModuleRepository');
+const { protect, authorize } = require('../../middleware/auth');
+const ModuleRepository = require('../../repositories/ModuleRepository');
 const ApiError = require('../../utils/ApiError');
 
 // Protected admin routes

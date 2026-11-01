@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const newsletterController = require('../controllers/pg/newsletterController');
+const newsletterController = require('../controllers/newsletterController');
 
 router.post('/subscribe', newsletterController.subscribe);
 router.post('/unsubscribe', newsletterController.unsubscribe);
 
 module.exports = router;
+

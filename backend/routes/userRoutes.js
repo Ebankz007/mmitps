@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/pg/userController');
-const noteController = require('../controllers/pg/noteController');
-const userEmailController = require('../controllers/pg/userEmailController');
-const { protect } = require('../middleware/pg/auth');
+const userController = require('../controllers/userController');
+const noteController = require('../controllers/noteController');
+const userEmailController = require('../controllers/userEmailController');
+const { protect } = require('../middleware/auth');
 const { uploadAvatar } = require('../middleware/upload');
 const { uploadLimiter } = require('../middleware/rateLimit');
 
@@ -28,3 +28,4 @@ router.get('/email-preferences',  userEmailController.getEmailPreferences);
 router.put('/email-preferences',  userEmailController.updateEmailPreferences);
 
 module.exports = router;
+

@@ -5,8 +5,8 @@
  */
 const express = require('express');
 const router = express.Router();
-const analysisController = require('../controllers/pg/analysisController');
-const { protect, authorize } = require('../middleware/pg/auth');
+const analysisController = require('../controllers/analysisController');
+const { protect, authorize } = require('../middleware/auth');
 
 // Public routes
 router.get('/', analysisController.getActiveAnalysis);
@@ -18,3 +18,4 @@ router.post('/', authorize('admin', 'analyst', 'instructor'), analysisController
 router.delete('/:id', authorize('admin', 'analyst', 'instructor'), analysisController.deleteAnalysis);
 
 module.exports = router;
+

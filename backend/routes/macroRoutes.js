@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const macroController = require('../controllers/pg/macroController');
-const COTService = require('../services/trading/COTService');
-const { protect, authorize } = require('../middleware/pg/auth');
+const macroController = require('../controllers/macroController');
+const COTService = require('../services/COTService');
+const { protect, authorize } = require('../middleware/auth');
 
 router.use(protect);
 
@@ -24,3 +24,5 @@ router.get('/cot/historical-index', async (req, res) => {
 router.post('/sync', authorize('admin'), macroController.syncData);
 
 module.exports = router;
+
+

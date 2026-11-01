@@ -1,56 +1,47 @@
-const { Newsletter } = require('../models');
+/**
+ * newsletterController — PostgreSQL edition.
+ * Mirrors the Mongo controllers/newsletterController.
+ */
+const NewsletterRepository = require('../repositories/NewsletterRepository');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
-/**
- * Subscribe to newsletter
- * @route POST /api/v1/newsletter/subscribe
- * @access Public
- */
 exports.subscribe = catchAsync(async (req, res) => {
-    const { email } = req.body;
+  const { email } = req.body;
+  if (!email) throw new ApiError(400, 'Email required');
 
-    if (!email) {
-        return res.status(400).json(new ApiResponse(false, null, 'Email is required'));
+  const existing = await NewsletterRepository.findByEmail(email);
+  if (existing) {
+    if (existing.status === 'active') {
+      throw new ApiError(400, 'Already subscribed');
     }
+    const updated = await NewsletterRepository.update(existing.id, {
+      status: 'active',
+      subscribedAt: new Date(),
+    });
+    return res.status(200).json(new ApiResponse(true, updated, 'Subscription reactivated'));
+  }
 
-    // Check if already subscribed
-    const existing = await Newsletter.findOne({ email });
-    if (existing) {
-        if (existing.status === 'active') {
-            return res.status(400).json(new ApiResponse(false, null, 'Email is already subscribed'));
-        }
-
-        // Re-activate if unsubscribed
-        existing.status = 'active';
-        await existing.save();
-        return res.status(200).json(new ApiResponse(true, null, 'Re-subscribed successfully'));
-    }
-
-    await Newsletter.create({ email });
-
-    res.status(201).json(new ApiResponse(true, null, 'Thank you for subscribing to our newsletter!'));
+  const subscriber = await NewsletterRepository.create({
+    email,
+    status: 'active',
+    subscribedAt: new Date(),
+  });
+  res.status(201).json(new ApiResponse(true, subscriber, 'Subscribed successfully'));
 });
 
-/**
- * Unsubscribe from newsletter
- * @route POST /api/v1/newsletter/unsubscribe
- * @access Public
- */
 exports.unsubscribe = catchAsync(async (req, res) => {
-    const { email } = req.body;
+  const { email } = req.body;
+  if (!email) throw new ApiError(400, 'Email required');
 
-    if (!email) {
-        return res.status(400).json(new ApiResponse(false, null, 'Email is required'));
-    }
+  const existing = await NewsletterRepository.findByEmail(email);
+  if (!existing) throw new ApiError(404, 'Subscription not found');
 
-    const subscription = await Newsletter.findOne({ email });
-    if (!subscription) {
-        return res.status(404).json(new ApiResponse(false, null, 'Subscription not found'));
-    }
-
-    subscription.status = 'unsubscribed';
-    await subscription.save();
-
-    res.status(200).json(new ApiResponse(true, null, 'You have been unsubscribed from our newsletter.'));
+  const updated = await NewsletterRepository.update(existing.id, {
+    status: 'unsubscribed',
+    unsubscribedAt: new Date(),
+  });
+  res.status(200).json(new ApiResponse(true, updated, 'Unsubscribed'));
 });
+

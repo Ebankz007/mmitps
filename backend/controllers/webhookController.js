@@ -12,8 +12,8 @@
  */
 const crypto = require('crypto');
 const logger = require('../utils/logger');
-const TransactionRepository = require('../repositories/pg/TransactionRepository');
-const WalletRepository = require('../repositories/pg/WalletRepository');
+const TransactionRepository = require('../repositories/TransactionRepository');
+const WalletRepository = require('../repositories/WalletRepository');
 
 // ─── Signature verification helpers ────────────────────────────────────────
 

@@ -9,7 +9,7 @@ const bcrypt = require('bcryptjs');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const UserRepository = require('./repositories/pg/UserRepository');
+const UserRepository = require('./repositories/UserRepository');
 const { pool } = require('../db');
 
 const SEED_USERS = [

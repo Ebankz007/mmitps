@@ -1,133 +1,101 @@
-const { SystemService } = require('../models');
+/**
+ * AdminServicesController — PostgreSQL edition.
+ * System services CRUD + health (mirrors Mongo adminServicesController).
+ */
+const SystemServiceRepository = require('../repositories/SystemServiceRepository');
+const catchAsync = require('../utils/catchAsync');
+const ApiResponse = require('../utils/ApiResponse');
+const ApiError = require('../utils/ApiError');
 
-// @desc    Get all services
-// @route   GET /api/v1/admin/services
-// @access  Private/Admin
-exports.getAllServices = async (req, res) => {
-    try {
-        const services = await SystemService.find();
+/** GET /admin/services — keyed by name for frontend compatibility */
+exports.getAllServices = catchAsync(async (req, res) => {
+  const services = await SystemServiceRepository.findAll({});
+  const servicesConfig = {};
+  services.forEach(s => {
+    servicesConfig[s.name] = s;
+  });
+  res.status(200).json({ success: true, data: servicesConfig });
+});
 
-        // Convert array to object keyed by name to maintain frontend compatibility
-        const servicesConfig = {};
-        services.forEach(s => {
-            servicesConfig[s.name] = s.toObject();
-        });
+/** PUT /admin/services/:serviceName */
+exports.updateService = catchAsync(async (req, res) => {
+  const { serviceName } = req.params;
+  const { url, apiKey, isActive, healthEndpoint, description } = req.body;
 
-        res.status(200).json({
-            success: true,
-            data: servicesConfig
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-};
+  const svc = await SystemServiceRepository.findByName(serviceName);
+  if (!svc) {
+    return res.status(404).json({ success: false, error: 'Service not found' });
+  }
 
-// @desc    Update service configuration
-// @route   PUT /api/v1/admin/services/:serviceName
-// @access  Private/Admin
-exports.updateService = async (req, res) => {
-    try {
-        const { serviceName } = req.params;
-        const { url, apiKey, isActive, healthEndpoint, description } = req.body;
+  const data = {};
+  if (url) data.url = url;
+  if (apiKey !== undefined) data.apiKey = apiKey;
+  if (typeof isActive !== 'undefined') data.isActive = isActive;
+  if (healthEndpoint) data.healthEndpoint = healthEndpoint;
+  if (description) data.description = description;
 
-        const svc = await SystemService.findOne({ name: serviceName });
-        if (!svc) {
-            return res.status(404).json({ success: false, error: 'Service not found' });
-        }
+  const updated = await SystemServiceRepository.update(svc.id, data);
+  res.status(200).json({ success: true, data: updated });
+});
 
-        if (url) svc.url = url;
-        if (apiKey !== undefined) svc.apiKey = apiKey;
-        if (typeof isActive !== 'undefined') svc.isActive = isActive;
-        if (healthEndpoint) svc.healthEndpoint = healthEndpoint;
-        if (description) svc.description = description;
+/** POST /admin/services */
+exports.addService = catchAsync(async (req, res) => {
+  const { serviceName, url, apiKey, healthEndpoint = '/health', description } = req.body;
 
-        await svc.save();
+  if (!serviceName || !url) {
+    return res.status(400).json({ success: false, error: 'Service name and URL required' });
+  }
 
-        res.status(200).json({
-            success: true,
-            data: svc
-        });
-    } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
-    }
-};
+  const existing = await SystemServiceRepository.findByName(serviceName);
+  if (existing) {
+    return res.status(400).json({ success: false, error: 'Service already exists' });
+  }
 
-// @desc    Add new service
-// @route   POST /api/v1/admin/services
-// @access  Private/Admin
-exports.addService = async (req, res) => {
-    try {
-        const { serviceName, url, apiKey, healthEndpoint = '/health', description } = req.body;
+  const svc = await SystemServiceRepository.create({
+    name: serviceName,
+    url,
+    healthEndpoint,
+    apiKey: apiKey || '',
+    status: 'offline',
+    isActive: true,
+    description,
+  });
 
-        if (!serviceName || !url) {
-            return res.status(400).json({ success: false, error: 'Service name and URL required' });
-        }
+  res.status(201).json({ success: true, data: svc });
+});
 
-        const existing = await SystemService.findOne({ name: serviceName });
-        if (existing) {
-            return res.status(400).json({ success: false, error: 'Service already exists' });
-        }
+/** DELETE /admin/services/:serviceName */
+exports.removeService = catchAsync(async (req, res) => {
+  const { serviceName } = req.params;
 
-        const svc = await SystemService.create({
-            name: serviceName,
-            url,
-            healthEndpoint,
-            apiKey: apiKey || '',
-            status: 'offline',
-            isActive: true,
-            description
-        });
+  const svc = await SystemServiceRepository.findByName(serviceName);
+  if (!svc) {
+    return res.status(404).json({ success: false, error: 'Service not found' });
+  }
 
-        res.status(201).json({
-            success: true,
-            data: svc
-        });
-    } catch (error) {
-        res.status(400).json({ success: false, error: error.message });
-    }
-};
+  await SystemServiceRepository.delete(svc.id);
+  res.status(200).json({ success: true, data: {} });
+});
 
-// @desc    Remove service
-// @route   DELETE /api/v1/admin/services/:serviceName
-// @access  Private/Admin
-exports.removeService = async (req, res) => {
-    try {
-        const { serviceName } = req.params;
+/** POST /admin/services/:serviceName/health */
+exports.testServiceHealth = catchAsync(async (req, res) => {
+  const { serviceName } = req.params;
 
-        const svc = await SystemService.findOneAndDelete({ name: serviceName });
-        if (!svc) {
-            return res.status(404).json({ success: false, error: 'Service not found' });
-        }
+  const svc = await SystemServiceRepository.findByName(serviceName);
+  if (!svc) {
+    return res.status(404).json({ success: false, error: 'Service not found' });
+  }
 
-        res.status(200).json({ success: true, data: {} });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-};
+  // Mock health check (in production, would make actual HTTP request)
+  const updated = await SystemServiceRepository.update(svc.id, {
+    status: 'online',
+    lastHealthCheck: new Date(),
+  });
 
-// @desc    Test service health
-// @route   POST /api/v1/admin/services/:serviceName/health
-// @access  Private/Admin
-exports.testServiceHealth = async (req, res) => {
-    try {
-        const { serviceName } = req.params;
+  res.status(200).json({
+    success: true,
+    message: 'Health check successful',
+    data: updated,
+  });
+});
 
-        const svc = await SystemService.findOne({ name: serviceName });
-        if (!svc) {
-            return res.status(404).json({ success: false, error: 'Service not found' });
-        }
-
-        // Mock health check (in production, would make actual HTTP request)
-        svc.status = 'online';
-        svc.lastHealthCheck = new Date();
-        await svc.save();
-
-        res.status(200).json({
-            success: true,
-            message: 'Health check successful',
-            data: svc
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-};

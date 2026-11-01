@@ -1,241 +1,225 @@
+/**
+ * AuthService — PostgreSQL edition.
+ * Same interface as the Mongo version. Differences:
+ *  - Passwords hashed explicitly with bcryptjs (no Mongoose pre-save hook)
+ *  - Plain-object users from Drizzle repos (no comparePassword/toJSON/save)
+ *  - resetPassword uses repo filters with $gt on resetPasswordExpire
+ */
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const UserRepository = require('../repositories/UserRepository');
 const TokenService = require('./TokenService');
 const ApiError = require('../utils/ApiError');
 
+const hashPassword = (plain) => bcrypt.hash(plain, 10);
+const stripPassword = (user) => {
+  if (!user) return user;
+  const { password, ...rest } = user;
+  return rest;
+};
+
 class AuthService {
-    /**
-     * Register a new user
-     * @param {Object} userBody 
-     * @returns {Promise<Object>} { user, tokens }
-     */
-    async register(userBody) {
-        if (await UserRepository.emailExists(userBody.email)) {
-            throw ApiError.conflict('Email already taken');
-        }
-
-        const { sponsorId, ...rest } = userBody;
-
-        // Create user
-        const newUserPayload = { ...rest };
-        if (userBody.tierId) {
-            newUserPayload.preferences = newUserPayload.preferences || {};
-            newUserPayload.preferences.tier = userBody.tierId;
-        }
-
-        const user = await UserRepository.create(newUserPayload);
-
-        // Genealogy Placement
-        if (sponsorId) {
-            const GenealogyService = require('./mlm/GenealogyService');
-            try {
-                await GenealogyService.placeUser(user._id, sponsorId, 'auto');
-            } catch (error) {
-                console.error('Failed to place user in genealogy tree:', error);
-                // We don't want to fail registration if tree placement fails,
-                // though in a production MLM app, this might be a critical failure.
-            }
-        }
-
-        // Generate tokens
-        const tokens = await TokenService.generateAuthTokens(user);
-
-        // Send welcome email
-        const EmailService = require('./emailService');
-        try {
-            await EmailService.sendWelcomeEmail(user);
-        } catch (error) {
-            console.error('Failed to send welcome email:', error);
-        }
-
-        return { user, tokens };
+  /** Register a new user */
+  async register(userBody) {
+    if (await UserRepository.emailExists(userBody.email)) {
+      throw ApiError.conflict('Email already taken');
     }
 
-    /**
-     * Login with email and password
-     * @param {String} email 
-     * @param {String} password 
-     * @returns {Promise<Object>} { user, tokens }
-     */
-    async login(email, password) {
-        console.log(`[DEBUG AUTH] Attempting login for email: ${email}`);
-        const user = await UserRepository.findByEmailWithPassword(email);
+    const { sponsorId, ...rest } = userBody;
 
-        if (!user) {
-            console.log(`[DEBUG AUTH] User not found for email: ${email}`);
-            throw ApiError.unauthorized('Incorrect email or password');
+    const newUserPayload = { ...rest };
+
+    // Contract preservation: Mongo-era clients send profile fields top-level
+    // (firstName/lastName/phone/avatar/country). The PG schema stores them under
+    // the `profile` jsonb column — map them over when not already nested.
+    if (!newUserPayload.profile) {
+      const PROFILE_FIELDS = ['firstName', 'lastName', 'phone', 'avatar', 'country'];
+      const hasTopLevel = PROFILE_FIELDS.some((k) => newUserPayload[k] !== undefined);
+      if (hasTopLevel) {
+        newUserPayload.profile = {};
+        for (const k of PROFILE_FIELDS) {
+          if (newUserPayload[k] !== undefined) {
+            newUserPayload.profile[k] = newUserPayload[k];
+            delete newUserPayload[k];
+          }
         }
-
-        console.log(`[DEBUG AUTH] User found. ID: ${user._id}. Role: ${user.role}. Comparing passwords...`);
-        const isMatch = await user.comparePassword(password);
-        console.log(`[DEBUG AUTH] Password matching result: ${isMatch}`);
-
-        if (!isMatch) {
-            console.log(`[DEBUG AUTH] Password mismatch for user: ${email}`);
-            throw ApiError.unauthorized('Incorrect email or password');
-        }
-
-        // Sanitize user before returning (remove password)
-        const userWithoutPassword = user.toJSON();
-
-        const tokens = await TokenService.generateAuthTokens(user);
-        console.log(`[DEBUG AUTH] [${new Date().toISOString()}] Login successful for: ${email}. Tokens generated.`);
-
-        return { user: userWithoutPassword, tokens };
+      }
     }
 
-    /**
-     * Refresh auth tokens
-     * @param {String} refreshToken
-     * @returns {Promise<Object>} { access, refresh }
-     */
-    async refreshAuth(refreshToken) {
-        try {
-            const payload = await TokenService.verifyToken(refreshToken, 'refresh');
-            const user = await UserRepository.findById(payload.sub);
+    if (userBody.tierId) {
+      newUserPayload.preferences = newUserPayload.preferences || {};
+      newUserPayload.preferences.tier = userBody.tierId;
+    }
+    // Explicit hashing — no Mongoose pre-save hook in the pg path
+    newUserPayload.password = await hashPassword(newUserPayload.password);
 
-            if (!user) {
-                throw new Error();
-            }
+    const user = await UserRepository.create(newUserPayload);
 
-            return TokenService.generateAuthTokens(user);
-        } catch (error) {
-            throw ApiError.unauthorized('Please authenticate');
-        }
+    // Genealogy placement (MLM — Phase 4 wires this to ltree; failures are non-fatal)
+    if (sponsorId) {
+      try {
+        const GenealogyService = require('../mlm/GenealogyService');
+        await GenealogyService.placeUser(user.id, sponsorId, 'auto');
+      } catch (error) {
+        console.error('[pg auth] Failed to place user in genealogy tree:', error.message);
+      }
     }
 
-    /**
-     * Logout (optional if using blacklisting, otherwise stateless)
-     * @param {String} refreshToken 
-     */
-    async logout(refreshToken) {
-        // Implementation for token blacklisting would go here
-        // For now, stateless JWT doesn't strictly require server-side logout unless tracking active tokens
-        return true;
+    const tokens = await TokenService.generateAuthTokens(user);
+
+    const EmailService = require('../emailService');
+    try {
+      await EmailService.sendWelcomeEmail(user);
+    } catch (error) {
+      console.error('[pg auth] Failed to send welcome email:', error.message);
     }
 
-    async forgotPassword(email) {
-        const user = await UserRepository.findByEmail(email);
-        if (!user) {
-            throw new ApiError(404, 'User not found');
-        }
+    return { user: stripPassword(user), tokens };
+  }
 
-        // Generate token
-        const crypto = require('crypto');
-        const resetToken = crypto.randomBytes(20).toString('hex');
-
-        // Hash and save to user
-        user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 mins
-
-        await user.save({ validateBeforeSave: false });
-
-        // Send email
-        const EmailService = require('./emailService');
-        // Use origin from env or fallback
-        const frontendUrl = process.env.FRONTEND_URL || 'https://app.mmitps.com';
-        const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
-
-        try {
-            await EmailService.sendPasswordReset(user, resetUrl);
-        } catch (err) {
-            user.resetPasswordToken = undefined;
-            user.resetPasswordExpire = undefined;
-            await user.save({ validateBeforeSave: false });
-            throw new ApiError(500, 'Email could not be sent');
-        }
+  /** Login with email and password */
+  async login(email, password) {
+    const user = await UserRepository.findByEmailWithPassword(email);
+    if (!user) {
+      throw ApiError.unauthorized('Incorrect email or password');
     }
 
-    async resetPassword(token, newPassword) {
-        const crypto = require('crypto');
-        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
-        // Need direct mongoose model access for custom query
-        const User = require('../models/User');
-        const user = await User.findOne({
-            resetPasswordToken: hashedToken,
-            resetPasswordExpire: { $gt: Date.now() }
-        });
-
-        if (!user) {
-            throw new ApiError(400, 'Token is invalid or has expired');
-        }
-
-        user.password = newPassword;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpire = undefined;
-        await user.save();
-
-        return user;
-    }
-    /**
-     * Send magic link to user
-     * @param {string} email 
-     */
-    async sendMagicLink(email) {
-        const token = TokenService.generateMagicLinkToken(email);
-        const frontendUrl = process.env.FRONTEND_URL || 'https://app.mmitps.com';
-        const magicLink = `${frontendUrl}/login/verify?token=${token}`;
-
-        const EmailService = require('./emailService');
-        await EmailService.sendEmail(
-            email,
-            'Your MMITPS Magic Link',
-            `<h3>Login to MMITPS</h3>
-             <p>Click the link below to sign in instantly:</p>
-             <a href="${magicLink}">${magicLink}</a>
-             <p>This link expires in 15 minutes.</p>`
-        );
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw ApiError.unauthorized('Incorrect email or password');
     }
 
-    /**
-     * Verify magic link and return user + tokens
-     * @param {string} token 
-     * @returns {Promise<Object>}
-     */
-    async verifyMagicLink(token) {
-        const email = TokenService.verifyMagicLinkToken(token);
-        let user = await UserRepository.findByEmail(email);
+    const tokens = await TokenService.generateAuthTokens(user);
+    return { user: stripPassword(user), tokens };
+  }
 
-        if (!user) {
-            // Auto-register user if they don't exist
-            user = await UserRepository.create({
-                email,
-                username: email.split('@')[0],
-                password: require('crypto').randomBytes(16).toString('hex'), // Random password for social/magic users
-                role: 'user',
-                isActive: true
-            });
-        }
+  /** Refresh auth tokens */
+  async refreshAuth(refreshToken) {
+    try {
+      const payload = await TokenService.verifyToken(refreshToken, 'refresh');
+      const user = await UserRepository.findById(payload.sub);
+      if (!user) {
+        throw new Error();
+      }
+      return TokenService.generateAuthTokens(user);
+    } catch (error) {
+      throw ApiError.unauthorized('Please authenticate');
+    }
+  }
 
-        const tokens = await TokenService.generateAuthTokens(user);
-        return { user: user.toJSON(), tokens };
+  /** Logout (stateless JWT — no server-side blacklist yet) */
+  async logout(refreshToken) {
+    return true;
+  }
+
+  /** Forgot password — issue reset token */
+  async forgotPassword(email) {
+    const user = await UserRepository.findByEmail(email);
+    if (!user) {
+      throw new ApiError(404, 'User not found');
     }
 
-    /**
-     * Sync user from social provider
-     * @param {Object} profile 
-     * @returns {Promise<Object>}
-     */
-    async syncSocialUser(profile) {
-        const { email, firstName, lastName, provider } = profile;
-        let user = await UserRepository.findByEmail(email);
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-        if (!user) {
-            user = await UserRepository.create({
-                email,
-                username: email.split('@')[0],
-                firstName,
-                lastName,
-                password: require('crypto').randomBytes(16).toString('hex'),
-                role: 'user',
-                isActive: true,
-                provider // Track provider
-            });
-        }
+    await UserRepository.update(user.id, {
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: new Date(Date.now() + 10 * 60 * 1000), // 10 mins
+    });
 
-        const tokens = await TokenService.generateAuthTokens(user);
-        return { user: user.toJSON(), tokens };
+    const EmailService = require('../emailService');
+    const frontendUrl = process.env.FRONTEND_URL || 'https://app.mmitps.com';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+
+    try {
+      await EmailService.sendPasswordReset(user, resetUrl);
+    } catch (err) {
+      await UserRepository.update(user.id, {
+        resetPasswordToken: null,
+        resetPasswordExpire: null,
+      });
+      throw new ApiError(500, 'Email could not be sent');
     }
+  }
+
+  /** Reset password with token */
+  async resetPassword(token, newPassword) {
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await UserRepository.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: new Date() },
+    });
+
+    if (!user) {
+      throw new ApiError(400, 'Token is invalid or has expired');
+    }
+
+    await UserRepository.update(user.id, {
+      password: await hashPassword(newPassword),
+      resetPasswordToken: null,
+      resetPasswordExpire: null,
+    });
+
+    return UserRepository.findById(user.id);
+  }
+
+  /** Send magic link */
+  async sendMagicLink(email) {
+    const token = TokenService.generateMagicLinkToken(email);
+    const frontendUrl = process.env.FRONTEND_URL || 'https://app.mmitps.com';
+    const magicLink = `${frontendUrl}/login/verify?token=${token}`;
+
+    const EmailService = require('../emailService');
+    await EmailService.sendEmail(
+      email,
+      'Your MMITPS Magic Link',
+      `<h3>Login to MMITPS</h3>
+       <p>Click the link below to sign in instantly:</p>
+       <a href="${magicLink}">${magicLink}</a>
+       <p>This link expires in 15 minutes.</p>`
+    );
+  }
+
+  /** Verify magic link and return user + tokens */
+  async verifyMagicLink(token) {
+    const email = TokenService.verifyMagicLinkToken(token);
+    let user = await UserRepository.findByEmail(email);
+
+    if (!user) {
+      user = await UserRepository.create({
+        email,
+        username: email.split('@')[0],
+        password: await hashPassword(crypto.randomBytes(16).toString('hex')),
+        role: 'user',
+        isActive: true,
+      });
+    }
+
+    const tokens = await TokenService.generateAuthTokens(user);
+    return { user: stripPassword(user), tokens };
+  }
+
+  /** Sync user from social provider */
+  async syncSocialUser(profile) {
+    const { email, firstName, lastName, provider } = profile;
+    let user = await UserRepository.findByEmail(email);
+
+    if (!user) {
+      user = await UserRepository.create({
+        email,
+        username: email.split('@')[0],
+        profile: { firstName, lastName },
+        password: await hashPassword(crypto.randomBytes(16).toString('hex')),
+        role: 'user',
+        isActive: true,
+      });
+    }
+
+    const tokens = await TokenService.generateAuthTokens(user);
+    return { user: stripPassword(user), tokens };
+  }
 }
 
 module.exports = new AuthService();
+

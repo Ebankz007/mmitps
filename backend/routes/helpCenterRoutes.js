@@ -11,8 +11,8 @@ const {
     updateArticle,
     deleteArticle,
     searchArticles
-} = require('../controllers/pg/helpCenterController');
-const { protect, authorize } = require('../middleware/pg/auth');
+} = require('../controllers/helpCenterController');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -45,3 +45,5 @@ router.route('/admin/articles/:id')
     .delete(deleteArticle);
 
 module.exports = router;
+
+

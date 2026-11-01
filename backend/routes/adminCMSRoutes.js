@@ -17,8 +17,8 @@ const {
     toggleMaintenance,
     getNewsArticles,
     getContentBlocks
-} = require('../controllers/pg/adminCMSController');
-const { protect, authorize } = require('../middleware/pg/auth');
+} = require('../controllers/adminCMSController');
+const { protect, authorize } = require('../middleware/auth');
 const cmsUpload = require('../middleware/cmsUpload');
 
 const router = express.Router();
@@ -64,3 +64,5 @@ router.get('/news', getNewsArticles);
 router.get('/blocks', getContentBlocks);
 
 module.exports = router;
+
+

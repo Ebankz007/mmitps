@@ -1,176 +1,195 @@
-const User = require('../models/User');
-const Tier = require('../models/Financial/Tier');
-const MLMCommission = require('../models/MLM/Commission');
-const mongoose = require('mongoose');
+/**
+ * TierService — PostgreSQL edition.
+ * Mirrors the Mongo TierService (locked-balance tier upgrades) on the pg stack.
+ * Users carry tier_id + locked_wallet_balance columns; locked commissions live
+ * in mlm_commissions (status = 'locked', unlocks_at_tier_level).
+ */
+const { pool } = require('../../db');
+const UserRepository = require('../repositories/UserRepository');
+const TierRepository = require('../repositories/TierRepository');
+const MLMCommissionRepository = require('../repositories/MLMCommissionRepository');
 
 class TierService {
+  /**
+   * Calculates the prorated difference between the user's current tier and desired tier.
+   */
+  static calculateUpgradeCost(currentTier, targetTier) {
+    if (!currentTier || !targetTier) return 0;
+    if (targetTier.level <= currentTier.level) return 0; // No downgrades/sideways via this path
+    const diff = Number(targetTier.price) - Number(currentTier.price);
+    return diff > 0 ? diff : 0;
+  }
 
-    /**
-     * Calculates the prorated difference between the user's current tier and desired tier.
-     * @param {Object} currentTier 
-     * @param {Object} targetTier 
-     * @returns {Number} the cost to upgrade (0 if invalid)
-     */
-    static calculateUpgradeCost(currentTier, targetTier) {
-        if (!currentTier || !targetTier) return 0;
-        if (targetTier.level <= currentTier.level) return 0; // Can't downgrade or sideways grade via this path
+  /**
+   * Retrieves the locked wallet balance and checks sufficiency for the target tier.
+   */
+  static async checkLockedBalanceUpgradeExigency(userId, targetTierId) {
+    const user = await UserRepository.findById(userId);
+    const targetTier = await TierRepository.findById(targetTierId);
 
-        const diff = targetTier.price - currentTier.price;
-        return diff > 0 ? diff : 0;
-    }
+    if (!user || !targetTier || !user.tierId) throw new Error('Invalid upgrade parameters');
 
-    /**
-     * Retrieves the locked wallet balance and checks if it's sufficient for the target tier upgrade.
-     */
-    static async checkLockedBalanceUpgradeExigency(userId, targetTierId) {
-        const user = await User.findById(userId).populate('preferences.tier');
-        const targetTier = await Tier.findById(targetTierId);
+    const currentTier = await TierRepository.findById(user.tierId);
+    if (!currentTier) throw new Error('User currently has no tier');
 
-        if (!user || !targetTier || !user.preferences.tier) throw new Error("Invalid upgrade parameters");
+    const upgradeCost = this.calculateUpgradeCost(currentTier, targetTier);
+    if (upgradeCost <= 0) throw new Error('Invalid target tier level');
 
-        const upgradeCost = this.calculateUpgradeCost(user.preferences.tier, targetTier);
-        if (upgradeCost <= 0) throw new Error("Invalid target tier level");
+    return {
+      canUpgradeWithBalance: Number(user.lockedWalletBalance || 0) >= upgradeCost,
+      lockedBalance: Number(user.lockedWalletBalance || 0),
+      upgradeCost,
+      currentTier,
+      targetTier,
+    };
+  }
 
-        return {
-            canUpgradeWithBalance: user.preferences.lockedWalletBalance >= upgradeCost,
-            lockedBalance: user.preferences.lockedWalletBalance,
-            upgradeCost,
-            currentTier: user.preferences.tier,
-            targetTier
-        };
-    }
+  /**
+   * Consumes locked commissions to upgrade the user if sufficient balance exists.
+   * Runs in a single PG transaction.
+   */
+  static async upgradeViaLockedBalance(userId, targetTierId) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    /**
-     * Consumes locked commissions to upgrade the user if sufficient balance exists.
-     * Transactional to prevent partial failures.
-     */
-    static async upgradeViaLockedBalance(userId, targetTierId) {
-        try {
-            return await this._upgradeViaLockedBalanceInternal(userId, targetTierId, true);
-        } catch (error) {
-            // Fallback for local development environments without Replica Set
-            if (error.message && error.message.includes('Transaction numbers are only allowed')) {
-                return await this._upgradeViaLockedBalanceInternal(userId, targetTierId, false);
-            }
-            throw error;
+      const user = await UserRepository.findById(userId);
+      const targetTier = await TierRepository.findById(targetTierId);
+
+      if (!user || !targetTier || !user.tierId) throw new Error('Invalid upgrade parameters');
+      const currentTier = await TierRepository.findById(user.tierId);
+      if (!currentTier) throw new Error('User currently has no tier');
+
+      const upgradeCost = this.calculateUpgradeCost(currentTier, targetTier);
+      if (upgradeCost <= 0) throw new Error('Invalid tier upgrade path');
+
+      if (Number(user.lockedWalletBalance || 0) < upgradeCost) {
+        throw new Error('Insufficient locked commission balance to upgrade');
+      }
+
+      // Find all locked commissions for this user, oldest first
+      const lockedCommissions = await MLMCommissionRepository.findAll(
+        { userId, status: 'locked' },
+        { sort: 'createdAt' }
+      );
+
+      let remainingCost = upgradeCost;
+
+      for (const commission of lockedCommissions) {
+        if (remainingCost <= 0) break;
+
+        const amount = Number(commission.amount);
+        if (amount <= remainingCost) {
+          remainingCost -= amount;
+          await client.query(
+            `UPDATE mlm_commissions SET status = 'approved', is_used_for_upgrade = true WHERE id = $1`,
+            [commission.id]
+          );
+        } else {
+          // Split: consume `remainingCost`, keep the rest locked as a remainder
+          const remainder = amount - remainingCost;
+          await client.query(
+            `UPDATE mlm_commissions SET amount = $1, status = 'approved', is_used_for_upgrade = true WHERE id = $2`,
+            [remainingCost, commission.id]
+          );
+          await client.query(
+            `INSERT INTO mlm_commissions (user_id, type, amount, currency, status, unlocks_at_tier_level, description)
+             VALUES ($1, $2, $3, $4, 'locked', $5, $6)`,
+            [commission.userId, commission.type, remainder, commission.currency || 'USD',
+             commission.unlocksAtTierLevel, 'Remainder from tier upgrade partial consumption']
+          );
+          remainingCost = 0;
         }
+      }
+
+      // Deduct from locked balance and set the new tier
+      const newLockedBalance = Number(user.lockedWalletBalance || 0) - upgradeCost;
+      await client.query(
+        `UPDATE users SET locked_wallet_balance = $1, tier_id = $2 WHERE id = $3`,
+        [newLockedBalance, targetTierId, userId]
+      );
+
+      // Unlock other commissions now eligible at the new tier level
+      await this._unlockEligibleCommissionsTx(client, userId, targetTier.level);
+
+      await client.query('COMMIT');
+      return { success: true, newTier: targetTier.code };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
+  }
 
-    static async _upgradeViaLockedBalanceInternal(userId, targetTierId, useTransaction = true) {
-        let session = null;
-        if (useTransaction) {
-            session = await mongoose.startSession();
-            session.startTransaction();
-        }
+  /**
+   * Upgrades the user traditionally via cash/crypto payment (simulated).
+   */
+  static async upgradeNormally(userId, targetTierId) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-        const opts = useTransaction ? { session } : {};
+      const targetTier = await TierRepository.findById(targetTierId);
+      if (!targetTier) throw new Error('Target tier not found');
 
-        try {
-            const user = await User.findById(userId).populate('preferences.tier').setOptions(opts);
-            const targetTier = await Tier.findById(targetTierId).setOptions(opts);
+      await client.query(`UPDATE users SET tier_id = $1 WHERE id = $2`, [targetTierId, userId]);
+      await this._unlockEligibleCommissionsTx(client, userId, targetTier.level);
 
-            if (!user.preferences.tier) throw new Error("User currently has no tier");
-            const upgradeCost = this.calculateUpgradeCost(user.preferences.tier, targetTier);
-            if (upgradeCost <= 0) throw new Error("Invalid tier upgrade path");
-
-            if (user.preferences.lockedWalletBalance < upgradeCost) {
-                throw new Error("Insufficient locked commission balance to upgrade");
-            }
-
-            // Find all locked commissions for this user
-            const lockedCommissions = await MLMCommission.find({
-                user: userId,
-                status: 'locked'
-            }).sort({ createdAt: 1 }).setOptions(opts);
-
-            let remainingCost = upgradeCost;
-
-            for (const commission of lockedCommissions) {
-                if (remainingCost <= 0) break;
-
-                commission.status = 'approved';
-                commission.isUsedForUpgrade = true;
-
-                if (commission.amount <= remainingCost) {
-                    remainingCost -= commission.amount;
-                } else {
-                    const remainingCommission = new MLMCommission({
-                        user: commission.user,
-                        type: commission.type,
-                        amount: commission.amount - remainingCost,
-                        currency: commission.currency,
-                        status: 'locked',
-                        unlocksAtTierLevel: commission.unlocksAtTierLevel,
-                        description: `Remainder from tier upgrade partial consumption`
-                    });
-                    await remainingCommission.save(opts);
-
-                    commission.amount = remainingCost;
-                    remainingCost = 0;
-                }
-                await commission.save(opts);
-            }
-
-            // Deduct from locked balance
-            user.preferences.lockedWalletBalance -= upgradeCost;
-            user.preferences.tier = targetTier._id;
-            await user.save(opts);
-
-            // Unlock other commissions
-            await this.unlockEligibleCommissions(userId, targetTier.level, session);
-
-            if (useTransaction) await session.commitTransaction();
-            return { success: true, newTier: targetTier.code };
-
-        } catch (error) {
-            if (useTransaction && session) await session.abortTransaction();
-            throw error;
-        } finally {
-            if (session) session.endSession();
-        }
+      await client.query('COMMIT');
+      return { success: true, newTier: targetTier.code };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
+  }
 
-    /**
-     * Upgrades the user traditionally via cash/crypto payment
-     */
-    static async upgradeNormally(userId, targetTierId) {
-        const targetTier = await Tier.findById(targetTierId);
-        const user = await User.findById(userId);
+  /**
+   * Called after any tier upgrade to free up previously locked commissions
+   * whose unlocks_at_tier_level is now satisfied. Runs inside a caller-provided
+   * transaction client.
+   */
+  static async _unlockEligibleCommissionsTx(client, userId, newTierLevel) {
+    const result = await client.query(
+      `SELECT COALESCE(SUM(amount), 0) AS total FROM mlm_commissions
+       WHERE user_id = $1 AND status = 'locked' AND unlocks_at_tier_level <= $2`,
+      [userId, newTierLevel]
+    );
+    const totalUnlocked = Number(result.rows[0].total);
 
-        user.preferences.tier = targetTierId;
-        await user.save();
-
-        await this.unlockEligibleCommissions(userId, targetTier.level);
+    if (totalUnlocked > 0) {
+      await client.query(
+        `UPDATE mlm_commissions SET status = 'approved'
+         WHERE user_id = $1 AND status = 'locked' AND unlocks_at_tier_level <= $2`,
+        [userId, newTierLevel]
+      );
+      await client.query(
+        `UPDATE users SET locked_wallet_balance = GREATEST(locked_wallet_balance - $1, 0) WHERE id = $2`,
+        [totalUnlocked, userId]
+      );
     }
+  }
 
-    /**
-     * Called automatically after any tier upgrade to free up previously locked money
-     */
-    static async unlockEligibleCommissions(userId, newTierLevel, parentSession = null) {
-        const query = {
-            user: userId,
-            status: 'locked',
-            unlocksAtTierLevel: { $lte: newTierLevel }
-        };
-
-        const update = {
-            $set: { status: 'approved' }
-        };
-
-        const options = parentSession ? { session: parentSession } : {};
-
-        const commissionsToUnlock = await MLMCommission.find(query, null, options);
-
-        if (commissionsToUnlock.length > 0) {
-            const totalUnlocked = commissionsToUnlock.reduce((sum, c) => sum + c.amount, 0);
-
-            await MLMCommission.updateMany(query, update, options);
-
-            await User.findByIdAndUpdate(userId, {
-                $inc: { 'preferences.lockedWalletBalance': -totalUnlocked }
-            }, options);
-        }
+  /**
+   * Public wrapper (non-transactional) — kept for parity with the Mongo API.
+   */
+  static async unlockEligibleCommissions(userId, newTierLevel) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await this._unlockEligibleCommissionsTx(client, userId, newTierLevel);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
+  }
 }
 
 module.exports = TierService;
+
+

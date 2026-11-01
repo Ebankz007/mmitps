@@ -1,6 +1,6 @@
 const express = require('express');
-const adminBonusController = require('../controllers/pg/adminBonusController');
-const { protect, restrictTo } = require('../middleware/pg/auth');
+const adminBonusController = require('../controllers/adminBonusController');
+const { protect, restrictTo } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -27,3 +27,4 @@ router
     .put(adminBonusController.processClaim);
 
 module.exports = router;
+

@@ -1,8 +1,8 @@
-const FibonacciTimeService = require('../services/ptd/FibonacciTimeService');
-const GannSquareService = require('../services/ptd/GannSquareService');
-const AstroCycleService = require('../services/ptd/AstroCycleService');
-const FourierCycleService = require('../services/ptd/FourierCycleService');
-const PTDBacktestService = require('../services/ptd/PTDBacktestService');
+const FibonacciTimeService = require('../services/FibonacciTimeService');
+const GannSquareService = require('../services/GannSquareService');
+const AstroCycleService = require('../services/AstroCycleService');
+const FourierCycleService = require('../services/FourierCycleService');
+const PTDBacktestService = require('../services/PTDBacktestService');
 
 const MODULE_ACCURACIES = {
     fibonacci: { accuracy: 82, last50: 84, last100: 82, allTime: 80 },
@@ -255,3 +255,4 @@ exports.getTradeLog = async (req, res) => {
     }));
     res.json({ success: true, data: trades });
 };
+

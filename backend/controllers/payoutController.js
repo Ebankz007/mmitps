@@ -1,5 +1,8 @@
-const PendingWithdrawal = require('../models/Financial/PendingWithdrawal');
-const WalletService = require('../services/financial/WalletService');
+/**
+ * PayoutController — PostgreSQL edition.
+ */
+const PendingWithdrawalRepository = require('../repositories/PendingWithdrawalRepository');
+const WalletService = require('../services/WalletService');
 const catchAsync = require('../utils/catchAsync');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
@@ -11,13 +14,13 @@ exports.requestPayout = catchAsync(async (req, res) => {
     const { amount, currency, paymentMethod, destination } = req.body;
 
     // Check balance before creating request
-    const balance = await WalletService.getBalance(req.user._id, currency);
+    const balance = await WalletService.getBalance(req.user.id, currency);
     if (balance < amount) {
         throw ApiError.badRequest(`Insufficient ${currency} balance`);
     }
 
-    const payout = await PendingWithdrawal.create({
-        user: req.user._id,
+    const payout = await PendingWithdrawalRepository.create({
+        userId: req.user.id,
         amount,
         currency,
         netAmount: amount, // Minus fees if applicable
@@ -33,8 +36,10 @@ exports.requestPayout = catchAsync(async (req, res) => {
  * Get payout history for current user
  */
 exports.getMyPayouts = catchAsync(async (req, res) => {
-    const payouts = await PendingWithdrawal.find({ user: req.user._id })
-        .sort({ createdAt: -1 });
+    const payouts = await PendingWithdrawalRepository.findByUserId(req.user.id, {
+        sort: 'createdAt',
+        direction: 'desc'
+    });
     res.status(200).json(new ApiResponse(true, payouts, 'Payout history retrieved'));
 });
 
@@ -43,14 +48,17 @@ exports.getMyPayouts = catchAsync(async (req, res) => {
  */
 exports.cancelPayout = catchAsync(async (req, res) => {
     const { id } = req.params;
-    const payout = await PendingWithdrawal.findOne({ _id: id, user: req.user._id, status: 'pending_approval' });
+    const payout = await PendingWithdrawalRepository.findOne({
+        id,
+        userId: req.user.id,
+        status: 'pending_approval'
+    });
 
     if (!payout) {
         throw ApiError.notFound('Pending payout not found or already processed');
     }
 
-    payout.status = 'cancelled';
-    await payout.save();
-
-    res.status(200).json(new ApiResponse(true, payout, 'Payout request cancelled'));
+    const cancelled = await PendingWithdrawalRepository.markCancelled(id);
+    res.status(200).json(new ApiResponse(true, cancelled, 'Payout request cancelled'));
 });
+
